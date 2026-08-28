@@ -1,14 +1,20 @@
 package com.acme.sica;
 
-/**
- * Punto de entrada de SICA (Sistema Integrado de Control de Acceso).
- *
- * Por ahora solo confirma que el esqueleto del proyecto arranca correctamente.
- * A partir del Dia 2 (HU-03) aqui se lanzara la pantalla de login (Swing/JOptionPane).
- */
+import com.acme.sica.usuarios.application.AutenticarUsuarioService;
+import com.acme.sica.usuarios.application.UsuarioRepository;
+import com.acme.sica.usuarios.infrastructure.LoginView;
+import com.acme.sica.usuarios.infrastructure.UsuarioRepositoryJdbc;
+
+import javax.swing.SwingUtilities;
+
 public class Main {
+
     public static void main(String[] args) {
-        System.out.println("SICA - Sistema Integrado de Control de Acceso para Zona Acme");
-        System.out.println("Esqueleto del proyecto (Dia 1) inicializado correctamente.");
+        SwingUtilities.invokeLater(() -> {
+            UsuarioRepository usuarioRepository = new UsuarioRepositoryJdbc();
+            AutenticarUsuarioService autenticarUsuarioService =
+                    new AutenticarUsuarioService(usuarioRepository);
+            new LoginView(autenticarUsuarioService).mostrar();
+        });
     }
 }
