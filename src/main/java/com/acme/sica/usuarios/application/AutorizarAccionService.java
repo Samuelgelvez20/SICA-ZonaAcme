@@ -1,9 +1,17 @@
 package com.acme.sica.usuarios.application;
 
+import com.acme.sica.auditoria.application.AuditoriaService;
+import com.acme.sica.auditoria.domain.ResultadoAuditoria;
 import com.acme.sica.shared.AccesoDenegadoException;
 import com.acme.sica.usuarios.domain.Usuario;
 
 public class AutorizarAccionService {
+
+    private final AuditoriaService auditoriaService;
+
+    public AutorizarAccionService(AuditoriaService auditoriaService) {
+        this.auditoriaService = auditoriaService;
+    }
 
     /**
      * Verifica que el usuario autenticado tenga el permiso requerido.
@@ -40,12 +48,9 @@ public class AutorizarAccionService {
         }
 
         if (!usuario.getRol().tienePermiso(permisoRequerido)) {
-            // TODO HU-05: registrar AUTORIZACION_DENEGADA en bitacora_auditoria
-            //             con detalle = "username=" + usuario.getUsername()
-            //                       + " permiso=" + permisoRequerido.
-            //             Las verificaciones exitosas NO se auditan aqui;
-            //             las audita el caso de uso de negocio que origino
-            //             la llamada.
+            auditoriaService.registrar(usuario.getId(), "AUTORIZACION_DENEGADA", "usuarios",
+                    "username=" + usuario.getUsername() + " permiso=" + permisoRequerido,
+                    ResultadoAuditoria.FALLO);
             throw AccesoDenegadoException.porPermisoFaltante(
                     usuario.getUsername(), permisoRequerido);
         }
