@@ -1,5 +1,7 @@
 package com.acme.sica.usuarios.application;
 
+import com.acme.sica.auditoria.application.AuditoriaService;
+import com.acme.sica.auditoria.domain.ResultadoAuditoria;
 import com.acme.sica.shared.CredencialesInvalidasException;
 import com.acme.sica.usuarios.domain.Usuario;
 
@@ -15,49 +17,53 @@ public class AutenticarUsuarioService {
             "Usuario o contraseña incorrectos, o usuario inactivo";
 
     private final UsuarioRepository usuarioRepository;
+    private final AuditoriaService auditoriaService;
 
-    public AutenticarUsuarioService(UsuarioRepository usuarioRepository) {
+    public AutenticarUsuarioService(UsuarioRepository usuarioRepository,
+                                     AuditoriaService auditoriaService) {
         this.usuarioRepository = usuarioRepository;
+        this.auditoriaService = auditoriaService;
     }
 
     public Usuario autenticar(String username, String passwordPlano) {
         if (username == null || username.isBlank()
                 || passwordPlano == null || passwordPlano.isEmpty()) {
-            // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
-            //             accion = "LOGIN", resultado = "FALLO",
-            //             detalle = "credenciales vacias".
+            auditoriaService.registrar(null, "LOGIN", "usuarios",
+                    "Intento de login: credenciales vacías",
+                    ResultadoAuditoria.FALLO);
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
-        Optional<Usuario> opt = usuarioRepository.buscarPorUsername(username.trim());
+        String usernameTrim = username.trim();
+        Optional<Usuario> opt = usuarioRepository.buscarPorUsername(usernameTrim);
 
         if (opt.isEmpty()) {
-            // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
-            //             accion = "LOGIN", resultado = "FALLO",
-            //             detalle = "username=" + username + " (no existe)".
+            auditoriaService.registrar(null, "LOGIN", "usuarios",
+                    "Intento de login: usuario '" + usernameTrim + "' no existe",
+                    ResultadoAuditoria.FALLO);
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
         Usuario usuario = opt.get();
 
         if (!usuario.isActivo()) {
-            // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
-            //             accion = "LOGIN", resultado = "FALLO",
-            //             detalle = "username=" + username + " (inactivo)".
+            auditoriaService.registrar(usuario.getId(), "LOGIN", "usuarios",
+                    "Intento de login: usuario '" + usernameTrim + "' está inactivo",
+                    ResultadoAuditoria.FALLO);
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
         String hashCalculado = sha256Hex(passwordPlano);
         if (!hashCalculado.equalsIgnoreCase(usuario.getPasswordHash())) {
-            // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
-            //             accion = "LOGIN", resultado = "FALLO",
-            //             detalle = "username=" + username + " (password invalido)".
+            auditoriaService.registrar(usuario.getId(), "LOGIN", "usuarios",
+                    "Intento de login: password incorrecto para '" + usernameTrim + "'",
+                    ResultadoAuditoria.FALLO);
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
-        // TODO HU-05: registrar login exitoso en bitacora_auditoria
-        //             accion = "LOGIN", resultado = "EXITO",
-        //             usuario = usuario, detalle = "username=" + username.
+        auditoriaService.registrar(usuario.getId(), "LOGIN", "usuarios",
+                "Login exitoso para '" + usernameTrim + "'",
+                ResultadoAuditoria.EXITO);
         return usuario;
     }
 
