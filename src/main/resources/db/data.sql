@@ -27,7 +27,7 @@ SELECT (SELECT id FROM roles WHERE nombre = 'ADMIN'), id FROM permisos;
 INSERT INTO rol_permisos (rol_id, permiso_id)
 SELECT (SELECT id FROM roles WHERE nombre = 'GUARDA'), id
 FROM permisos
-WHERE codigo IN ('registrar_visita', 'checkin_visita', 'checkout_visita', 'editar_persona');
+WHERE codigo IN ('registrar_visita', 'checkin_visita', 'checkout_visita');
 
 INSERT INTO rol_permisos (rol_id, permiso_id)
 SELECT (SELECT id FROM roles WHERE nombre = 'FUNCIONARIO'), id
