@@ -107,9 +107,11 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-06 · Gestión de personas y empresas `[ALTA]`
 **Como** funcionario o admin, **quiero** registrar y consultar personas (trabajadores/invitados) y empresas, **para** tener la base de datos de quién puede circular por el complejo.
-- [ ] Slice `personas`: entidades `Persona`, `Empresa`.
-- [ ] CRUD protegido por permisos RBAC.
-- [ ] Cada operación dispara auditoría.
+- [x] Slice `personas`: entidades `Persona`, `Empresa`, `TipoPersona`.
+- [x] CRUD protegido por permisos RBAC (permiso `editar_persona`).
+- [x] Cada operación dispara auditoría (CREAR_EMPRESA, CREAR_PERSONA, ACTUALIZAR_PERSONA con EXITO/FALLO; listar NO audita por ser lectura).
+- [x] `EntidadDuplicadaException` genérica en `shared` para duplicados.
+- [x] Ajuste permisos: GUARDA sin `editar_persona` (solo FUNCIONARIO y ADMIN).
 - **Commit:** `feat(personas): CRUD de personas y empresas con RBAC y auditoría`
 
 ### HU-07 · Pre-registro de invitado `[ALTA]`
