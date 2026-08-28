@@ -78,25 +78,27 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-03 · Login y autenticación `[CRÍTICA]`
 **Como** usuario del sistema (Guarda/Funcionario/Admin), **quiero** iniciar sesión con usuario y contraseña, **para** acceder solo a las funciones de mi rol.
-- [ ] Slice `usuarios`: entidades `Usuario`, `Rol`, `Permiso`.
-- [ ] Puerto `UsuarioRepository` + adaptador JDBC.
-- [ ] `ConexionPostgres` como **Singleton**.
-- [ ] `AutenticarUsuarioService` (valida credenciales, distingue éxito/fallo).
-- [ ] UI de login con `JOptionPane`.
+- [x] Slice `usuarios`: entidades `Usuario`, `Rol`, `Permiso`.
+- [x] Puerto `UsuarioRepository` + adaptador JDBC.
+- [x] `ConexionPostgres` como **Singleton**.
+- [x] `AutenticarUsuarioService` (valida credenciales, distingue éxito/fallo).
+- [x] UI de login con `JOptionPane`.
+- [x] **TODO HU-05 conectado:** 4 caminos de login ahora registran en bitacora_auditoria (usuario no existe, password incorrecto, usuario inactivo, login exitoso) con detalles específicos; mensaje genérico al usuario se mantiene por seguridad.
 - **Commit:** `feat(rbac): entidades de usuarios roles y permisos`, `feat(rbac): servicio de autenticación`
 
 ### HU-04 · Autorización por permisos `[CRÍTICA]`
 **Como** sistema, **quiero** verificar que el rol del usuario tenga el permiso exacto antes de ejecutar cualquier acción crítica, **para** cumplir con RBAC y denegar accesos no autorizados con un mensaje claro.
-- [ ] `AutorizarAccionService`: recibe usuario + código de permiso, valida contra BD.
-- [ ] Excepción de dominio `AccesoDenegadoException` con mensaje claro para la UI.
-- [ ] Aplicar la verificación como punto de entrada obligatorio de cada caso de uso posterior (no opcional).
+- [x] `AutorizarAccionService`: recibe usuario + código de permiso, valida contra BD.
+- [x] Excepción de dominio `AccesoDenegadoException` con mensaje claro para la UI.
+- [x] Aplicar la verificación como punto de entrada obligatorio de cada caso de uso posterior (no opcional).
+- [x] **TODO HU-05 conectado:** camino de denegación registra AUTORIZACION_DENEGADA en bitacora_auditoria con detalle "username=X permiso=Y"; caminos exitosos NO se auditan aquí (decisión HU-04).
 - **Commit:** `feat(rbac): validación de autorización por permiso`
 
 ### HU-05 · Bitácora de auditoría `[CRÍTICA]`
 **Como** administrador, **quiero** que cada acción crítica quede registrada en una bitácora inmutable, **para** poder investigar incidentes y cumplir con trazabilidad.
-- [ ] Slice `auditoria`: entidad `BitacoraAuditoria`, puerto + adaptador JDBC.
-- [ ] `AuditoriaService.registrar(usuario, accion, entidad, detalle, resultado)`.
-- [ ] Integrarlo ya en login (éxito/fallo) y dejar el gancho listo para todos los servicios que vienen.
+- [x] Slice `auditoria`: entidad `BitacoraAuditoria`, puerto + adaptador JDBC.
+- [x] `AuditoriaService.registrar(usuario, accion, entidad, detalle, resultado)`.
+- [x] Integrarlo ya en login (éxito/fallo) y dejar el gancho listo para todos los servicios que vienen.
 - **Commit:** `feat(auditoria): servicio de bitácora de auditoría`
 
 ---
