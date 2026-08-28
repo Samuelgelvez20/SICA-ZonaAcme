@@ -24,6 +24,8 @@ public class AutenticarUsuarioService {
         if (username == null || username.isBlank()
                 || passwordPlano == null || passwordPlano.isEmpty()) {
             // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
+            //             accion = "LOGIN", resultado = "FALLO",
+            //             detalle = "credenciales vacias".
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
@@ -31,6 +33,8 @@ public class AutenticarUsuarioService {
 
         if (opt.isEmpty()) {
             // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
+            //             accion = "LOGIN", resultado = "FALLO",
+            //             detalle = "username=" + username + " (no existe)".
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
@@ -38,16 +42,22 @@ public class AutenticarUsuarioService {
 
         if (!usuario.isActivo()) {
             // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
+            //             accion = "LOGIN", resultado = "FALLO",
+            //             detalle = "username=" + username + " (inactivo)".
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
         String hashCalculado = sha256Hex(passwordPlano);
         if (!hashCalculado.equalsIgnoreCase(usuario.getPasswordHash())) {
             // TODO HU-05: registrar intento de login fallido en bitacora_auditoria
+            //             accion = "LOGIN", resultado = "FALLO",
+            //             detalle = "username=" + username + " (password invalido)".
             throw new CredencialesInvalidasException(MENSAJE_FALLO);
         }
 
         // TODO HU-05: registrar login exitoso en bitacora_auditoria
+        //             accion = "LOGIN", resultado = "EXITO",
+        //             usuario = usuario, detalle = "username=" + username.
         return usuario;
     }
 
