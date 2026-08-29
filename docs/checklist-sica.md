@@ -160,17 +160,19 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-12 · Salida olvidada (regularización automática) `[ALTA]`
 **Como** sistema, **quiero** detectar si la última visita de una persona quedó abierta (`DENTRO`) al momento de un nuevo ingreso, **para** cerrarla automáticamente por auditoría sin bloquear el nuevo acceso.
-- [ ] Verificación previa a cualquier nuevo check-in.
-- [ ] Si aplica: cerrar la anterior como `CERRADA_POR_SISTEMA_SALIDA_OLVIDADA` + crear la nueva visita.
-- [ ] Auditar ambos eventos.
-- **Commit:** `feat(visitas): regularización automática de salida olvidada`
+- [x] Verificación previa a cualquier nuevo check-in (en `RegistrarCheckInService`).
+- [x] Si aplica: cerrar la anterior como `CERRADA_POR_SISTEMA_SALIDA_OLVIDADA` + `fechaHoraSalida=now`.
+- [x] Auditar `CIERRE_AUTOMATICO_SALIDA_OLVIDADA` como evento SEPARADO del `CHECKIN_VISITA`.
+- [x] Caso normal (sin visita DENTRO previa) sin regresión.
+- **Commit:** `refactor(visitas): HU-12 salida olvidada - regularización automática`
 
 ### HU-13 · Check-out normal `[ALTA]`
 **Como** guarda de seguridad, **quiero** registrar la salida de una persona que sí se anuncia al retirarse, **para** cerrar correctamente su visita como `CERRADA`.
-- [ ] `RegistrarCheckOutService`.
-- [ ] Búsqueda de la visita `DENTRO` activa de esa persona y cierre con `fecha_hora_salida`.
-- [ ] Auditoría del check-out.
-- **Commit:** `feat(visitas): check-out normal de visita`
+- [x] `RegistrarCheckOutService` (autoriza `checkout_visita`, busca visita DENTRO, cierra como CERRADA).
+- [x] Búsqueda de la visita `DENTRO` activa y cierre con `fecha_hora_salida`.
+- [x] Auditoría `CHECKOUT_VISITA` (éxito/fallo).
+- [x] `CheckOutView` (Swing gemela a CheckInView: campo + botón, SwingWorker, JOptionPane).
+- **Commit:** `feat(visitas): HU-13 check-out normal`
 
 ---
 
