@@ -3,6 +3,10 @@ package com.acme.sica;
 import com.acme.sica.auditoria.application.AuditoriaService;
 import com.acme.sica.auditoria.application.BitacoraRepository;
 import com.acme.sica.auditoria.infrastructure.BitacoraRepositoryJdbc;
+import com.acme.sica.incidentes.application.IncidenteRepository;
+import com.acme.sica.incidentes.application.RegistrarIncidenteService;
+import com.acme.sica.incidentes.infrastructure.IncidenteRepositoryJdbc;
+import com.acme.sica.personas.application.BloquearPersonaService;
 import com.acme.sica.personas.application.CrearEmpresaService;
 import com.acme.sica.personas.application.CrearPersonaService;
 import com.acme.sica.personas.application.ActualizarPersonaService;
@@ -99,6 +103,15 @@ public class Main {
             RegistrarCheckOutService registrarCheckOutService =
                     new RegistrarCheckOutService(personaRepository, autorizarAccionService,
                             visitaRepository, auditoriaService);
+
+            // HU-14: Incidentes y bloqueo de personas
+            IncidenteRepository incidenteRepository = new IncidenteRepositoryJdbc();
+            RegistrarIncidenteService registrarIncidenteService =
+                    new RegistrarIncidenteService(autorizarAccionService, personaRepository,
+                            incidenteRepository, auditoriaService);
+            BloquearPersonaService bloquearPersonaService =
+                    new BloquearPersonaService(autorizarAccionService, personaRepository,
+                            auditoriaService);
 
             // Decisión de integración: CheckInView y LoginView son piezas independientes
             // que se prueban por separado. La navegación real por rol (Guarda → CheckInView,
