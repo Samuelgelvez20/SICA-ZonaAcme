@@ -21,6 +21,7 @@ import com.acme.sica.visitas.application.AprobarORechazarVisitaService;
 import com.acme.sica.visitas.application.NotificadorVisitas;
 import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
+import com.acme.sica.visitas.application.RegistrarCheckOutService;
 import com.acme.sica.visitas.application.RegistrarIngresoPorOlvidoService;
 import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.application.VisitaRepository;
@@ -28,6 +29,7 @@ import com.acme.sica.visitas.domain.ReglaValidacionIngreso;
 import com.acme.sica.visitas.domain.ValidacionIngresoNoAnunciado;
 import com.acme.sica.visitas.domain.ValidacionIngresoPorOlvido;
 import com.acme.sica.visitas.infrastructure.CheckInView;
+import com.acme.sica.visitas.infrastructure.CheckOutView;
 import com.acme.sica.visitas.infrastructure.FuncionarioPendientesView;
 import com.acme.sica.visitas.infrastructure.IngresoPorOlvidoView;
 import com.acme.sica.visitas.infrastructure.NotificadorVisitasEnMemoria;
@@ -92,6 +94,11 @@ public class Main {
                     new RegistrarIngresoPorOlvidoService(personaRepository, autorizarAccionService,
                             visitaRepository, auditoriaService, notificadorVisitas,
                             validacionPorOlvido);
+
+            // HU-13: Check-out normal
+            RegistrarCheckOutService registrarCheckOutService =
+                    new RegistrarCheckOutService(personaRepository, autorizarAccionService,
+                            visitaRepository, auditoriaService);
 
             // Decisión de integración: CheckInView y LoginView son piezas independientes
             // que se prueban por separado. La navegación real por rol (Guarda → CheckInView,
