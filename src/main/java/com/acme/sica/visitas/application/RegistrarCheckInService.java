@@ -43,7 +43,23 @@ public class RegistrarCheckInService {
         }
         var persona = personaOpt.get();
 
-        // c) Buscar visita aprobada pendiente de ingreso
+        // c) REGULARIZACIÓN AUTOMÁTICA: buscar visita DENTRO abierta (salida olvidada)
+        var visitaActivaOpt = visitaRepository.buscarVisitaActivaPorPersona(persona.getId());
+        if (visitaActivaOpt.isPresent()) {
+            Visita visitaOlvidada = visitaActivaOpt.get();
+            // Cerrar automáticamente la visita anterior
+            visitaOlvidada.setEstado(EstadoVisita.CERRADA_POR_SISTEMA_SALIDA_OLVIDADA);
+            visitaOlvidada.setFechaHoraSalida(LocalDateTime.now());
+            visitaRepository.actualizar(visitaOlvidada);
+
+            // Auditar cierre automático COMO EVENTO SEPARADO del check-in que sigue
+            String detalleCierre = "Visita " + visitaOlvidada.getId() + " cerrada automaticamente por sistema: " +
+                    "persona '" + documento + "' tenia una visita DENTRO sin cerrar";
+            auditoriaService.registrar(usuarioActual.getId(), "CIERRE_AUTOMATICO_SALIDA_OLVIDADA", "visitas",
+                    detalleCierre, ResultadoAuditoria.EXITO);
+        }
+
+        // d) Buscar visita aprobada pendiente de ingreso (flujo normal)
         var visitaOpt = visitaRepository.buscarVisitaAprobadaPendienteDeIngreso(persona.getId());
         if (visitaOpt.isEmpty()) {
             String detalle = "Intento de check-in: persona '" + documento + "' sin visita aprobada pendiente";
@@ -52,7 +68,7 @@ public class RegistrarCheckInService {
             throw SinVisitaAprobadaException.porDocumento(documento);
         }
 
-        // d) Actualizar la visita: estado = DENTRO, guardaId = usuarioActual, fechaHoraIngreso = now
+        // e) Actualizar la visita: estado = DENTRO, guardaId = usuarioActual, fechaHoraIngreso = now
         Visita visita = visitaOpt.get();
         visita.setEstado(EstadoVisita.DENTRO);
         visita.setGuardaId(usuarioActual.getId());
@@ -60,7 +76,7 @@ public class RegistrarCheckInService {
 
         Visita actualizada = visitaRepository.actualizar(visita);
 
-        // e) Auditar éxito
+        // f) Auditar éxito del check-in
         String detalleExito = "personaId=" + persona.getId() + ", persona=" + persona.getNombre()
                 + ", documento=" + documento + ", empresaVisitadaId=" + visita.getEmpresaVisitadaId();
         auditoriaService.registrar(usuarioActual.getId(), "CHECKIN_VISITA", "visitas",
