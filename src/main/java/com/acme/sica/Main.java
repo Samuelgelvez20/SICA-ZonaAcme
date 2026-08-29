@@ -67,7 +67,7 @@ public class Main {
             ActualizarPersonaService actualizarPersonaService =
                     new ActualizarPersonaService(personaRepository, autorizarAccionService, auditoriaService);
             ListarPersonasPorEmpresaService listarPersonasPorEmpresaService =
-                    new ListarPersonasPorEmpresaService(personaRepository, autorizarAccionService);
+                    new ListarPersonasPorEmpresaService(personaRepository, autorizarAccionService, auditoriaService);
 
             // HU-07: Pre-registro de invitado
             VisitaRepository visitaRepository = new VisitaRepositoryJdbc();
