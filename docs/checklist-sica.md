@@ -139,11 +139,15 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-10 · Notificación y aprobación en tiempo real `[ALTA]`
 **Como** funcionario de empresa, **quiero** ver en mi pantalla las solicitudes pendientes apenas se generan y aprobarlas o rechazarlas, **para** que el Guarda reciba la respuesta sin demora.
-- [ ] Patrón **Observer**: `VisitaObserver`, `VisitaNotificador` (sujeto).
-- [ ] Ejecución en hilo (`Thread`/`ExecutorService`) para no bloquear la UI.
-- [ ] `AprobarORechazarVisitaService`.
-- [ ] Pantalla del Funcionario (lista de pendientes) y pantalla del Guarda (se refresca al notificarse).
-- **Commit:** `feat(visitas): flujo de aprobación en tiempo real con observer`
+- [x] Patrón **Observer**: `VisitaObserver`, `NotificadorVisitas` (puerto), `NotificadorVisitasEnMemoria` (adaptador con `CopyOnWriteArrayList` + `ExecutorService` 2 hilos).
+- [x] Ejecución en hilo (`ExecutorService.newFixedThreadPool(2)`) para no bloquear la UI.
+- [x] `AprobarORechazarVisitaService` (autorización `aprobar_visita`, auditoría, notificación async post-persistencia).
+- [x] `VisitaNoDecidibleException` en shared (estados no decidibles / ya decididos).
+- [x] `FuncionarioPendientesView` (Swing, `VisitaObserver`, carga inicial con `listarPendientesPorFuncionario`, updates async via `SwingUtilities.invokeLater`).
+- [x] `PanelEsperaGuarda` (Swing, `VisitaObserver`, muestra decisión via `JOptionPane`, ofrece check-in inmediato).
+- [x] Cableado DI en `Main`: UNA sola instancia `NotificadorVisitasEnMemoria` compartida.
+- [x] Conecta HU-09: `RegistrarVisitaNoAnunciadaService` notifica vía `NotificadorVisitas`.
+- **Commit:** `feat(visitas): HU-10 Observer tiempo real + aprobaciones`
 
 ### HU-11 · Carnet olvidado `[ALTA]`
 **Como** guarda de seguridad, **quiero** marcar el ingreso de un trabajador que olvidó su carnet, **para** que su funcionario apruebe un pase puntual para ese día.
