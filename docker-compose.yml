@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: sica-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sica
+      POSTGRES_USER: sica_user
+      POSTGRES_PASSWORD: sica_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - sica_pgdata:/var/lib/postgresql/data
+
+volumes:
+  sica_pgdata:
