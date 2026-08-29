@@ -27,10 +27,16 @@ public class ActualizarPersonaService {
         autorizarAccionService.verificar(usuarioActual, "editar_persona");
 
         if (persona.getId() == null) {
+            auditoriaService.registrar(usuarioActual.getId(), "ACTUALIZAR_PERSONA", "personas",
+                    "Intento de actualización con ID nulo",
+                    ResultadoAuditoria.FALLO);
             throw new IllegalArgumentException("La persona debe tener un ID para actualizar");
         }
 
         if (personaRepository.buscarPorId(persona.getId()).isEmpty()) {
+            auditoriaService.registrar(usuarioActual.getId(), "ACTUALIZAR_PERSONA", "personas",
+                    "Persona no encontrada: id=" + persona.getId(),
+                    ResultadoAuditoria.FALLO);
             throw new NoSuchElementException("No existe una persona con id " + persona.getId());
         }
 
