@@ -177,6 +177,28 @@ public class PersonaRepositoryJdbc implements PersonaRepository {
         }
     }
 
+    @Override
+    public List<Persona> listarTodas() {
+        String sql = """
+                SELECT id, nombre, documento, tipo, foto_url, empresa_id,
+                       funcionario_anfitrion_id, bloqueado, motivo_bloqueo
+                FROM personas
+                ORDER BY nombre
+                """;
+        List<Persona> personas = new ArrayList<>();
+        try (Connection conn = ConexionPostgres.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                personas.add(mapPersona(rs));
+            }
+            return personas;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar todas las personas", e);
+        }
+    }
+
     private Persona mapPersona(ResultSet rs) throws SQLException {
         Persona persona = new Persona();
         persona.setId(rs.getLong("id"));

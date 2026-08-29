@@ -93,6 +93,68 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         }
     }
 
+    @Override
+    public List<Usuario> listarTodos() {
+        String sql = """
+                SELECT u.id            AS usuario_id,
+                       u.username      AS username,
+                       u.password_hash AS password_hash,
+                       u.nombre        AS nombre,
+                       u.activo        AS activo,
+                       r.id            AS rol_id,
+                       r.nombre        AS rol_nombre,
+                       p.id            AS permiso_id,
+                       p.codigo        AS permiso_codigo,
+                       p.descripcion   AS permiso_descripcion
+                  FROM usuarios u
+                  JOIN roles r ON r.id = u.rol_id
+                  LEFT JOIN rol_permisos rp ON rp.rol_id = r.id
+                  LEFT JOIN permisos p ON p.id = rp.permiso_id
+                 WHERE u.activo = TRUE
+                 ORDER BY u.nombre
+                """;
+        try (Connection conn = ConexionPostgres.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = ps.executeQuery()) {
+                Map<Long, UsuarioEnConstruccion> porUsuario = new HashMap<>();
+
+                while (rs.next()) {
+                    long usuarioId = rs.getLong("usuario_id");
+                    UsuarioEnConstruccion u = porUsuario.computeIfAbsent(usuarioId, id -> {
+                        try {
+                            return new UsuarioEnConstruccion(
+                                    id,
+                                    rs.getString("username"),
+                                    rs.getString("password_hash"),
+                                    rs.getString("nombre"),
+                                    rs.getBoolean("activo"),
+                                    rs.getLong("rol_id"),
+                                    rs.getString("rol_nombre")
+                            );
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    long permisoId = rs.getLong("permiso_id");
+                    if (!rs.wasNull()) {
+                        u.permisos.add(new Permiso(
+                                permisoId,
+                                rs.getString("permiso_codigo"),
+                                rs.getString("permiso_descripcion")
+                        ));
+                    }
+                }
+
+                return porUsuario.values().stream()
+                        .map(UsuarioEnConstruccion::toUsuario)
+                        .toList();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar todos los usuarios", e);
+        }
+    }
+
     private static Optional<Usuario> mapear(ResultSet rs) throws SQLException {
         Map<Long, UsuarioEnConstruccion> porUsuario = new HashMap<>();
 

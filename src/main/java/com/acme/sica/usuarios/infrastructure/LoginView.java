@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import java.awt.GridLayout;
+import java.util.Optional;
 
 public class LoginView {
 
@@ -19,11 +20,11 @@ public class LoginView {
         this.autenticarUsuarioService = autenticarUsuarioService;
     }
 
-    public void mostrar() {
+    public Optional<Usuario> mostrar() {
         while (true) {
             String[] credenciales = pedirCredenciales();
             if (credenciales == null) {
-                return;
+                return Optional.empty();
             }
             String username = credenciales[0];
             String password = credenciales[1];
@@ -35,7 +36,7 @@ public class LoginView {
                         "Bienvenido, " + usuario.getNombre() + " \u2014 rol " + usuario.getRol().getNombre(),
                         "SICA - Acceso concedido",
                         JOptionPane.INFORMATION_MESSAGE);
-                return;
+                return Optional.of(usuario);
             } catch (CredencialesInvalidasException ex) {
                 JOptionPane.showMessageDialog(
                         null,
@@ -48,7 +49,7 @@ public class LoginView {
                         "Error inesperado: " + ex.getMessage(),
                         "SICA - Error",
                         JOptionPane.ERROR_MESSAGE);
-                return;
+                return Optional.empty();
             }
         }
     }
