@@ -56,6 +56,43 @@ public class UsuarioRepositoryJdbc implements UsuarioRepository {
         }
     }
 
+    @Override
+    public Optional<Usuario> buscarPorId(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
+
+        String sql = """
+                SELECT u.id            AS usuario_id,
+                       u.username      AS username,
+                       u.password_hash AS password_hash,
+                       u.nombre        AS nombre,
+                       u.activo        AS activo,
+                       r.id            AS rol_id,
+                       r.nombre        AS rol_nombre,
+                       p.id            AS permiso_id,
+                       p.codigo        AS permiso_codigo,
+                       p.descripcion   AS permiso_descripcion
+                  FROM usuarios u
+                  JOIN roles r ON r.id = u.rol_id
+                  LEFT JOIN rol_permisos rp ON rp.rol_id = r.id
+                  LEFT JOIN permisos p ON p.id = rp.permiso_id
+                 WHERE u.id = ?
+                 ORDER BY r.id, p.id
+                """;
+        try (Connection conn = ConexionPostgres.getInstance().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return mapear(rs);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error consultando usuario por id " + id, e);
+        }
+    }
+
     private static Optional<Usuario> mapear(ResultSet rs) throws SQLException {
         Map<Long, UsuarioEnConstruccion> porUsuario = new HashMap<>();
 

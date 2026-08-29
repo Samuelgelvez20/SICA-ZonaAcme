@@ -33,4 +33,10 @@ public interface VisitaRepository {
      * \u00datil para cargar el estado inicial de la pantalla del funcionario.
      */
     List<Visita> listarPendientesPorFuncionario(Long funcionarioId);
+
+    /**
+     * Lista todas las visitas con estado DENTRO.
+     * Util para reporte de personas actualmente dentro del complejo.
+     */
+    List<Visita> listarVisitasDentro();
 }
