@@ -54,6 +54,7 @@ CREATE TABLE visitas (
     guarda_id INTEGER REFERENCES usuarios(id),
     funcionario_id INTEGER REFERENCES usuarios(id),
     empresa_visitada_id INTEGER REFERENCES empresas(id),
+    fecha_hora_programada TIMESTAMP,
     fecha_hora_ingreso TIMESTAMP,
     fecha_hora_salida TIMESTAMP,
     estado VARCHAR(40) NOT NULL CHECK (estado IN (
