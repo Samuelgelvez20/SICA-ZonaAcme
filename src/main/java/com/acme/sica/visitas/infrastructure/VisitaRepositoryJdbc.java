@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class VisitaRepositoryJdbc implements VisitaRepository {
@@ -183,6 +185,59 @@ public class VisitaRepositoryJdbc implements VisitaRepository {
             stmt.setString(idx, value);
         } else {
             stmt.setNull(idx, java.sql.Types.VARCHAR);
+        }
+    }
+
+    @Override
+    public Optional<Visita> buscarPorId(Long id) {
+        String sql = """
+                SELECT id, persona_id, guarda_id, funcionario_id, empresa_visitada_id,
+                       fecha_hora_programada, fecha_hora_ingreso, fecha_hora_salida,
+                       estado, motivo
+                FROM visitas
+                WHERE id = ?
+                """;
+        try (Connection conn = ConexionPostgres.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapVisita(rs));
+                }
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al buscar visita por id", e);
+        }
+    }
+
+    @Override
+    public List<Visita> listarPendientesPorFuncionario(Long funcionarioId) {
+        String sql = """
+                SELECT id, persona_id, guarda_id, funcionario_id, empresa_visitada_id,
+                       fecha_hora_programada, fecha_hora_ingreso, fecha_hora_salida,
+                       estado, motivo, creado_en
+                FROM visitas
+                WHERE funcionario_id = ?
+                  AND estado IN ('PENDIENTE_APROBACION', 'PENDIENTE_APROBACION_OLVIDO')
+                ORDER BY creado_en DESC
+                """;
+        try (Connection conn = ConexionPostgres.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, funcionarioId);
+
+            List<Visita> resultado = new ArrayList<>();
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    resultado.add(mapVisita(rs));
+                }
+            }
+            return resultado;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar pendientes por funcionario", e);
         }
     }
 }

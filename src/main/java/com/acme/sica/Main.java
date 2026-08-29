@@ -17,6 +17,8 @@ import com.acme.sica.usuarios.application.UsuarioRepository;
 import com.acme.sica.usuarios.domain.Usuario;
 import com.acme.sica.usuarios.infrastructure.LoginView;
 import com.acme.sica.usuarios.infrastructure.UsuarioRepositoryJdbc;
+import com.acme.sica.visitas.application.AprobarORechazarVisitaService;
+import com.acme.sica.visitas.application.NotificadorVisitas;
 import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
 import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
@@ -24,6 +26,9 @@ import com.acme.sica.visitas.application.VisitaRepository;
 import com.acme.sica.visitas.domain.ReglaValidacionIngreso;
 import com.acme.sica.visitas.domain.ValidacionIngresoNoAnunciado;
 import com.acme.sica.visitas.infrastructure.CheckInView;
+import com.acme.sica.visitas.infrastructure.FuncionarioPendientesView;
+import com.acme.sica.visitas.infrastructure.NotificadorVisitasEnMemoria;
+import com.acme.sica.visitas.infrastructure.PanelEsperaGuarda;
 import com.acme.sica.visitas.infrastructure.VisitaRepositoryJdbc;
 
 import javax.swing.SwingUtilities;
@@ -63,12 +68,20 @@ public class Main {
                     new RegistrarCheckInService(autorizarAccionService, personaRepository,
                             visitaRepository, auditoriaService);
 
-            // HU-09: Registro de visita no anunciada (Strategy inyectado)
+            // HU-10: Notificador Observer (UNA sola instancia compartida)
+            NotificadorVisitas notificadorVisitas = new NotificadorVisitasEnMemoria();
+
+            // HU-09: Registro de visita no anunciada (Strategy + Notificador inyectados)
             ReglaValidacionIngreso validacionNoAnunciada = new ValidacionIngresoNoAnunciado();
             RegistrarVisitaNoAnunciadaService registrarVisitaNoAnunciadaService =
                     new RegistrarVisitaNoAnunciadaService(autorizarAccionService, personaRepository,
                             crearPersonaService, visitaRepository, auditoriaService,
-                            validacionNoAnunciada);
+                            validacionNoAnunciada, notificadorVisitas);
+
+            // HU-10: Aprobar/Rechazar visita
+            AprobarORechazarVisitaService aprobarORechazarService =
+                    new AprobarORechazarVisitaService(visitaRepository, autorizarAccionService,
+                            auditoriaService, notificadorVisitas);
 
             // Decisión de integración: CheckInView y LoginView son piezas independientes
             // que se prueban por separado. La navegación real por rol (Guarda → CheckInView,
