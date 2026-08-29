@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface UsuarioRepository {
 
     Optional<Usuario> buscarPorUsername(String username);
+
+    Optional<Usuario> buscarPorId(Long id);
 }

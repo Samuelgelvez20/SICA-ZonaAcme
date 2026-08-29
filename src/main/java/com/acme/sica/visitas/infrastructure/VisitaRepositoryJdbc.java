@@ -240,4 +240,29 @@ public class VisitaRepositoryJdbc implements VisitaRepository {
             throw new RuntimeException("Error al listar pendientes por funcionario", e);
         }
     }
+
+    @Override
+    public List<Visita> listarVisitasDentro() {
+        String sql = """
+                SELECT id, persona_id, guarda_id, funcionario_id, empresa_visitada_id,
+                       fecha_hora_programada, fecha_hora_ingreso, fecha_hora_salida,
+                       estado, motivo
+                FROM visitas
+                WHERE estado = 'DENTRO'
+                ORDER BY fecha_hora_ingreso DESC
+                """;
+        try (Connection conn = ConexionPostgres.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            List<Visita> resultado = new ArrayList<>();
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    resultado.add(mapVisita(rs));
+                }
+            }
+            return resultado;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar visitas dentro", e);
+        }
+    }
 }
