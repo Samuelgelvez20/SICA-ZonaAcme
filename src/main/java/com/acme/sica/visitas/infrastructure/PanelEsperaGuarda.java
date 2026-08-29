@@ -1,5 +1,7 @@
 package com.acme.sica.visitas.infrastructure;
 
+import com.acme.sica.personas.application.PersonaRepository;
+import com.acme.sica.personas.domain.Persona;
 import com.acme.sica.visitas.application.NotificadorVisitas;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
 import com.acme.sica.visitas.application.VisitaObserver;
@@ -8,8 +10,6 @@ import com.acme.sica.usuarios.domain.Usuario;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Panel ligero para el Guarda que muestra notificaciones de decisiones
@@ -23,14 +23,17 @@ public class PanelEsperaGuarda extends JPanel implements VisitaObserver {
     private final Usuario guardaActual;
     private final NotificadorVisitas notificadorVisitas;
     private final RegistrarCheckInService registrarCheckInService;
+    private final PersonaRepository personaRepository;
     private final JLabel statusLabel;
 
     public PanelEsperaGuarda(Usuario guardaActual,
                              NotificadorVisitas notificadorVisitas,
-                             RegistrarCheckInService registrarCheckInService) {
+                             RegistrarCheckInService registrarCheckInService,
+                             PersonaRepository personaRepository) {
         this.guardaActual = guardaActual;
         this.notificadorVisitas = notificadorVisitas;
         this.registrarCheckInService = registrarCheckInService;
+        this.personaRepository = personaRepository;
 
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createTitledBorder("Panel de Espera - " + guardaActual.getNombre()));
@@ -91,16 +94,21 @@ public class PanelEsperaGuarda extends JPanel implements VisitaObserver {
     }
 
     private String obtenerNombrePersona(Visita visita) {
-        // En una implementación real se haría join o lookup; aquí simplificado
-        return "Persona ID " + visita.getPersonaId();
+        return personaRepository.buscarPorId(visita.getPersonaId())
+                .map(Persona::getNombre)
+                .orElse("Persona ID " + visita.getPersonaId());
     }
 
     private void hacerCheckInInmediato(Visita visita) {
         try {
-            // El guarda ya tiene la persona delante, usamos el documento de la persona
-            // Para simplificar, asumimos que el guarda tiene el documento a mano
-            // En una implementación real se pasaría el documento o se buscaría por personaId
-            String documento = "doc-" + visita.getPersonaId(); // placeholder
+            var personaOpt = personaRepository.buscarPorId(visita.getPersonaId());
+            if (personaOpt.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "No se encontró la persona (ID " + visita.getPersonaId() + ") en el sistema.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            String documento = personaOpt.get().getDocumento();
             registrarCheckInService.ejecutar(guardaActual, documento);
             JOptionPane.showMessageDialog(this, "Check-in realizado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
