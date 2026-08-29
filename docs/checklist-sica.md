@@ -130,9 +130,12 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-09 · Ingreso de invitado no anunciado `[ALTA]`
 **Como** guarda de seguridad, **quiero** registrar a un invitado que llega sin cita (creando su Persona si no existe), **para** que el sistema le pida aprobación al funcionario correspondiente.
-- [ ] `RegistrarVisitaNoAnunciadaService` → estado `PENDIENTE_APROBACION`.
-- [ ] Si la persona no existe, permitir creación rápida desde la pantalla del Guarda.
-- **Commit:** `feat(visitas): registro de invitado no anunciado`
+- [x] `RegistrarVisitaNoAnunciadaService` → estado `PENDIENTE_APROBACION`.
+- [x] Si la persona no existe, permitir creación rápida desde la pantalla del Guarda.
+- [x] Patrón **Strategy**: `ReglaValidacionIngreso` + `ValidacionIngresoNoAnunciado` (validación liviana).
+- [x] `ValidacionIngresoException` en shared.
+- [x] `VisitaFactory.crearNoAnunciada` (motivo="Ingreso no anunciado").
+- **Commit:** `feat(visitas): HU-09 ingreso invitado no anunciado con Strategy`
 
 ### HU-10 · Notificación y aprobación en tiempo real `[ALTA]`
 **Como** funcionario de empresa, **quiero** ver en mi pantalla las solicitudes pendientes apenas se generan y aprobarlas o rechazarlas, **para** que el Guarda reciba la respuesta sin demora.
