@@ -22,19 +22,22 @@ public class RegistrarVisitaNoAnunciadaService {
     private final VisitaRepository visitaRepository;
     private final AuditoriaService auditoriaService;
     private final ReglaValidacionIngreso reglaValidacionIngreso;
+    private final NotificadorVisitas notificadorVisitas;
 
     public RegistrarVisitaNoAnunciadaService(AutorizarAccionService autorizarAccionService,
                                              PersonaRepository personaRepository,
                                              CrearPersonaService crearPersonaService,
                                              VisitaRepository visitaRepository,
                                              AuditoriaService auditoriaService,
-                                             ReglaValidacionIngreso reglaValidacionIngreso) {
+                                             ReglaValidacionIngreso reglaValidacionIngreso,
+                                             NotificadorVisitas notificadorVisitas) {
         this.autorizarAccionService = autorizarAccionService;
         this.personaRepository = personaRepository;
         this.crearPersonaService = crearPersonaService;
         this.visitaRepository = visitaRepository;
         this.auditoriaService = auditoriaService;
         this.reglaValidacionIngreso = reglaValidacionIngreso;
+        this.notificadorVisitas = notificadorVisitas;
     }
 
     public Visita registrar(Usuario usuarioActual, String documento,
@@ -80,6 +83,9 @@ public class RegistrarVisitaNoAnunciadaService {
                 ", empresaVisitadaId=" + empresaVisitadaId;
         auditoriaService.registrar(usuarioActual.getId(), "REGISTRAR_VISITA_NO_ANUNCIADA",
                 "visitas", detalleExito, ResultadoAuditoria.EXITO);
+
+        // g) Notificar solicitud pendiente (asíncrono)
+        notificadorVisitas.notificarSolicitudPendiente(guardada);
 
         return guardada;
     }
