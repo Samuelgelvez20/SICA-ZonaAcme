@@ -18,11 +18,12 @@ import com.acme.sica.usuarios.domain.Usuario;
 import com.acme.sica.usuarios.infrastructure.LoginView;
 import com.acme.sica.usuarios.infrastructure.UsuarioRepositoryJdbc;
 import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
+import com.acme.sica.visitas.application.RegistrarCheckInService;
 import com.acme.sica.visitas.application.VisitaRepository;
+import com.acme.sica.visitas.infrastructure.CheckInView;
 import com.acme.sica.visitas.infrastructure.VisitaRepositoryJdbc;
 
 import javax.swing.SwingUtilities;
-import java.time.LocalDateTime;
 
 public class Main {
 
@@ -54,50 +55,18 @@ public class Main {
                     new PreRegistrarInvitadoService(autorizarAccionService, personaRepository,
                             visitaRepository, auditoriaService);
 
-            // Smoke test temporal HU-07
-            ejecutarSmokeTestHU07(autenticarUsuarioService, preRegistrarInvitadoService);
+            // HU-08: Check-in de invitado pre-registrado
+            RegistrarCheckInService registrarCheckInService =
+                    new RegistrarCheckInService(autorizarAccionService, personaRepository,
+                            visitaRepository, auditoriaService);
 
+            // Decisión de integración: CheckInView y LoginView son piezas independientes
+            // que se prueban por separado. La navegación real por rol (Guarda → CheckInView,
+            // Funcionario → pantalla de aprobaciones, Admin → panel) se hará en HU-16.
+            // Por ahora lanzamos LoginView; CheckInView se puede probar comentando LoginView
+            // y descomentando la línea de abajo.
             new LoginView(autenticarUsuarioService).mostrar();
+            // new CheckInView(registrarCheckInService, autenticarUsuarioService.autenticar("guarda1", "1234")).mostrar();
         });
-    }
-
-    private static void ejecutarSmokeTestHU07(AutenticarUsuarioService autenticarUsuarioService,
-                                               PreRegistrarInvitadoService preRegistrarInvitadoService) {
-        // Autenticar a funcionario1 (Laura Gómez) - password "1234"
-        Usuario funcionario;
-        try {
-            funcionario = autenticarUsuarioService.autenticar("funcionario1", "1234");
-        } catch (Exception e) {
-            System.err.println("SMOKE TEST HU-07 FALLÓ: No se pudo autenticar funcionario1 - " + e.getMessage());
-            return;
-        }
-        System.out.println("SMOKE TEST HU-07: Autenticado " + funcionario.getNombre());
-
-        // Persona: Maria Rodríguez (documento 1009876543, id=2)
-        // Empresa: TechNova S.A.S. (id=1)
-        Long personaId = 2L;
-        Long empresaVisitadaId = 1L;
-        LocalDateTime fechaProgramada = LocalDateTime.now().plusDays(1); // mañana
-
-        try {
-            var visita = preRegistrarInvitadoService.ejecutar(funcionario, personaId, empresaVisitadaId, fechaProgramada);
-            System.out.println("SMOKE TEST HU-07 ÉXITO: Visita creada con ID=" + visita.getId()
-                    + ", estado=" + visita.getEstado()
-                    + ", fechaHoraProgramada=" + visita.getFechaHoraProgramada());
-        } catch (Exception e) {
-            System.err.println("SMOKE TEST HU-07 FALLÓ: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        // Probar con guarda1 (Carlos Pérez) - también tiene registrar_visita
-        try {
-            Usuario guarda = autenticarUsuarioService.autenticar("guarda1", "1234");
-            System.out.println("SMOKE TEST HU-07: Probando con " + guarda.getNombre() + " (también tiene registrar_visita)");
-            var visita2 = preRegistrarInvitadoService.ejecutar(guarda, personaId, empresaVisitadaId,
-                    LocalDateTime.now().plusDays(2));
-            System.out.println("SMOKE TEST HU-07 ÉXITO (guarda): Visita ID=" + visita2.getId());
-        } catch (Exception e) {
-            System.err.println("SMOKE TEST HU-07 FALLÓ (guarda): " + e.getMessage());
-        }
     }
 }
