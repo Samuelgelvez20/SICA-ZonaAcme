@@ -151,9 +151,12 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-11 · Carnet olvidado `[ALTA]`
 **Como** guarda de seguridad, **quiero** marcar el ingreso de un trabajador que olvidó su carnet, **para** que su funcionario apruebe un pase puntual para ese día.
-- [ ] `RegistrarIngresoPorOlvidoService` → estado `PENDIENTE_APROBACION_OLVIDO`.
-- [ ] Reutiliza el mismo mecanismo Observer de HU-10.
-- **Commit:** `feat(visitas): ingreso por carnet olvidado`
+- [x] `ValidacionIngresoPorOlvido` (2da implementación Strategy: solo TRABAJADOR, rechaza INVITADO).
+- [x] `VisitaFactory.crearPorOlvido` → `PENDIENTE_APROBACION_OLVIDO`, motivo="Carnet olvidado".
+- [x] `RegistrarIngresoPorOlvidoService` (NO crea persona, auto-rutea a funcionarioAnfitrionId/empresaId de la Persona).
+- [x] `IngresoPorOlvidoView` (Swing: documento + botón, SwingWorker).
+- [x] Reutiliza Observer de HU-10: NotificadorVisitas compartido, AprobarORechazarVisitaService, FuncionarioPendientesView sin cambios.
+- **Commit:** `feat(visitas): HU-11 carnet olvidado (Strategy 2da implementación)`
 
 ### HU-12 · Salida olvidada (regularización automática) `[ALTA]`
 **Como** sistema, **quiero** detectar si la última visita de una persona quedó abierta (`DENTRO`) al momento de un nuevo ingreso, **para** cerrarla automáticamente por auditoría sin bloquear el nuevo acceso.
