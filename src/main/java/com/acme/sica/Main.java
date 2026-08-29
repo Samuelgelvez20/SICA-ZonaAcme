@@ -21,12 +21,15 @@ import com.acme.sica.visitas.application.AprobarORechazarVisitaService;
 import com.acme.sica.visitas.application.NotificadorVisitas;
 import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
+import com.acme.sica.visitas.application.RegistrarIngresoPorOlvidoService;
 import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.application.VisitaRepository;
 import com.acme.sica.visitas.domain.ReglaValidacionIngreso;
 import com.acme.sica.visitas.domain.ValidacionIngresoNoAnunciado;
+import com.acme.sica.visitas.domain.ValidacionIngresoPorOlvido;
 import com.acme.sica.visitas.infrastructure.CheckInView;
 import com.acme.sica.visitas.infrastructure.FuncionarioPendientesView;
+import com.acme.sica.visitas.infrastructure.IngresoPorOlvidoView;
 import com.acme.sica.visitas.infrastructure.NotificadorVisitasEnMemoria;
 import com.acme.sica.visitas.infrastructure.PanelEsperaGuarda;
 import com.acme.sica.visitas.infrastructure.VisitaRepositoryJdbc;
@@ -82,6 +85,13 @@ public class Main {
             AprobarORechazarVisitaService aprobarORechazarService =
                     new AprobarORechazarVisitaService(visitaRepository, autorizarAccionService,
                             auditoriaService, notificadorVisitas);
+
+            // HU-11: Ingreso por carnet olvidado (Strategy + Notificador compartidos)
+            ReglaValidacionIngreso validacionPorOlvido = new ValidacionIngresoPorOlvido();
+            RegistrarIngresoPorOlvidoService registrarIngresoPorOlvidoService =
+                    new RegistrarIngresoPorOlvidoService(personaRepository, autorizarAccionService,
+                            visitaRepository, auditoriaService, notificadorVisitas,
+                            validacionPorOlvido);
 
             // Decisión de integración: CheckInView y LoginView son piezas independientes
             // que se prueban por separado. La navegación real por rol (Guarda → CheckInView,
