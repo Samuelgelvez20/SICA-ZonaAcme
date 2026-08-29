@@ -71,5 +71,28 @@ public final class VisitaFactory {
         return visita;
     }
 
-    // NO se agrega aún crearPorOlvido (HU-11)
+    /**
+     * Crea una visita por carnet olvidado (trabajador sin documento f\u00edsico).
+     *
+     * @param personaId         ID del trabajador (ya registrado)
+     * @param guardaId          ID del guarda que registra el ingreso
+     * @param funcionarioId     ID del funcionario anfitri\u00f3n (tomado de persona.getFuncionarioAnfitrionId)
+     * @param empresaVisitadaId ID de la empresa del trabajador (tomado de persona.getEmpresaId)
+     * @return Visita en estado {@link EstadoVisita#PENDIENTE_APROBACION_OLVIDO},
+     * {@code fechaHoraProgramada = null}, {@code fechaHoraIngreso = null},
+     * {@code fechaHoraSalida = null}, {@code motivo = "Carnet olvidado"}
+     */
+    public static Visita crearPorOlvido(Long personaId, Long guardaId,
+                                        Long funcionarioId, Long empresaVisitadaId) {
+        Visita visita = new Visita();
+        visita.setPersonaId(personaId);
+        visita.setGuardaId(guardaId);
+        visita.setFuncionarioId(funcionarioId);
+        visita.setEmpresaVisitadaId(empresaVisitadaId);
+        visita.setFechaHoraProgramada(null);
+        visita.setFechaHoraIngreso(null);
+        visita.setEstado(EstadoVisita.PENDIENTE_APROBACION_OLVIDO);
+        visita.setMotivo("Carnet olvidado");
+        return visita;
+    }
 }
