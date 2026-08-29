@@ -3,6 +3,7 @@ package com.acme.sica.visitas.application;
 import com.acme.sica.auditoria.application.AuditoriaService;
 import com.acme.sica.auditoria.domain.ResultadoAuditoria;
 import com.acme.sica.personas.application.PersonaRepository;
+import com.acme.sica.shared.PersonaBloqueadaException;
 import com.acme.sica.shared.PersonaNoEncontradaException;
 import com.acme.sica.shared.SinVisitaAprobadaException;
 import com.acme.sica.usuarios.application.AutorizarAccionService;
@@ -43,7 +44,18 @@ public class RegistrarCheckInService {
         }
         var persona = personaOpt.get();
 
-        // c) REGULARIZACIÓN AUTOMÁTICA: buscar visita DENTRO abierta (salida olvidada)
+        // c) COMPROBAR BLOQUEO
+        if (persona.isBloqueado()) {
+            auditoriaService.registrar(usuarioActual.getId(), "CHECKIN_PERSONA_BLOQUEADA", "personas",
+                    "personaId=" + persona.getId()
+                    + ", documento=" + documento
+                    + ", nombre=" + persona.getNombre()
+                    + ", motivoBloqueo=" + persona.getMotivoBloqueo(),
+                    ResultadoAuditoria.FALLO);
+            throw PersonaBloqueadaException.conMotivo(documento, persona.getMotivoBloqueo());
+        }
+
+        // d) REGULARIZACIÓN AUTOMÁTICA: buscar visita DENTRO abierta (salida olvidada)
         var visitaActivaOpt = visitaRepository.buscarVisitaActivaPorPersona(persona.getId());
         if (visitaActivaOpt.isPresent()) {
             Visita visitaOlvidada = visitaActivaOpt.get();
@@ -59,7 +71,7 @@ public class RegistrarCheckInService {
                     detalleCierre, ResultadoAuditoria.EXITO);
         }
 
-        // d) Buscar visita aprobada pendiente de ingreso (flujo normal)
+        // e) Buscar visita aprobada pendiente de ingreso (flujo normal)
         var visitaOpt = visitaRepository.buscarVisitaAprobadaPendienteDeIngreso(persona.getId());
         if (visitaOpt.isEmpty()) {
             String detalle = "Intento de check-in: persona '" + documento + "' sin visita aprobada pendiente";
@@ -68,7 +80,7 @@ public class RegistrarCheckInService {
             throw SinVisitaAprobadaException.porDocumento(documento);
         }
 
-        // e) Actualizar la visita: estado = DENTRO, guardaId = usuarioActual, fechaHoraIngreso = now
+        // f) Actualizar la visita: estado = DENTRO, guardaId = usuarioActual, fechaHoraIngreso = now
         Visita visita = visitaOpt.get();
         visita.setEstado(EstadoVisita.DENTRO);
         visita.setGuardaId(usuarioActual.getId());
@@ -76,7 +88,7 @@ public class RegistrarCheckInService {
 
         Visita actualizada = visitaRepository.actualizar(visita);
 
-        // f) Auditar éxito del check-in
+        // g) Auditar éxito del check-in
         String detalleExito = "personaId=" + persona.getId() + ", persona=" + persona.getNombre()
                 + ", documento=" + documento + ", empresaVisitadaId=" + visita.getEmpresaVisitadaId();
         auditoriaService.registrar(usuarioActual.getId(), "CHECKIN_VISITA", "visitas",
