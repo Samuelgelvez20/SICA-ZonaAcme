@@ -21,7 +21,8 @@ Zona Acme es un complejo empresarial con más de 30 empresas que actualmente con
 | Concurrencia / tiempo real | Hilos + patrón **Observer**. |
 | Spring Boot | No se usa en el alcance obligatorio — queda como ítem de bonus para explorar si sobra tiempo. |
 | Arquitectura | Hexagonal aplicando Vertical Slice+ (paquetes por feature, cada uno con `domain` / `application` / `infrastructure`). |
-| Patrones obligatorios | **Singleton** (conexión a Postgres) + **Observer** (notificación tiempo real). |
+| Patrones obligatorios | Mínimo **5** (documento oficial, actualizado desde el borrador que pedía 2): **Singleton** (conexión a Postgres, ✅ implementado en HU-03), **Observer** (notificación tiempo real, HU-10), **Repository** (puertos/adaptadores ya en uso en todos los slices desde HU-03), **Strategy** (reglas de validación de ingreso, HU-09/HU-11), **Factory Method** (creación de `Visita` según el flujo de origen, HU-07/09/11). |
+| Arquitectura (confirmado con el profesor) | **Hexagonal + Vertical Slice+ es obligatorio**, según indicación directa del profesor. El documento oficial menciona "MVC" en la sección de entregables, pero es texto de plantilla genérico — no aplica a este proyecto. Se documenta esta decisión en el README (HU-17). |
 | Lambdas / Stream API | Obligatorio en reportes, filtros de bitácora, listados de pendientes, validaciones en cadena, etc. — se marca explícitamente en cada historia donde aplica. |
 | Repo | Privado en GitHub, colaborador: `trainingLeader`. |
 
@@ -56,19 +57,19 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-01 · Estructura base del proyecto `[CRÍTICA]`
 **Como** desarrollador, **quiero** tener el repositorio y el proyecto Maven configurados con Git Flow, **para** empezar a desarrollar sobre una base ordenada.
-- [x] Crear repo privado en GitHub, agregar a `trainingLeader` como colaborador.
-- [x] `git flow init` (o estructura manual `main`/`develop`).
-- [x] Proyecto Maven con `pom.xml` (dependencia driver JDBC PostgreSQL).
-- [x] Paquetes por slice: `usuarios`, `personas`, `visitas`, `incidentes`, `reportes`, `auditoria`, `shared`, `config`, `ui`.
-- [x] `docker-compose.yml` con el servicio de PostgreSQL.
+- [ ] Crear repo privado en GitHub, agregar a `trainingLeader` como colaborador.
+- [ ] `git flow init` (o estructura manual `main`/`develop`).
+- [ ] Proyecto Maven con `pom.xml` (dependencia driver JDBC PostgreSQL).
+- [ ] Paquetes por slice: `usuarios`, `personas`, `visitas`, `incidentes`, `reportes`, `auditoria`, `shared`, `config`, `ui`.
+- [ ] `docker-compose.yml` con el servicio de PostgreSQL.
 - **Commit:** `chore: estructura base del proyecto Maven y docker-compose de postgres`
 
 ### HU-02 · Modelo de base de datos `[CRÍTICA]`
 **Como** equipo del proyecto, **quiero** un modelo de datos claro y consistente, **para** que todos los módulos posteriores tengan dónde persistir su información.
-- [x] Confirmar/ajustar el modelo de la sección 2.
-- [x] `schema.sql` con tablas, PK/FK y constraints.
-- [x] `data.sql`: roles base (Admin, Guarda, Funcionario), permisos mínimos (`crear_usuario`, `registrar_visita`, `generar_reporte`, `bloquear_persona` + los adicionales que se necesiten: `aprobar_visita`, `checkin_visita`, `checkout_visita`, `editar_persona`), usuarios de ejemplo por rol, empresas y personas de ejemplo.
-- [x] Levantar el contenedor (`docker compose up -d`), correr los scripts, validar en DBeaver.
+- [ ] Confirmar/ajustar el modelo de la sección 2.
+- [ ] `schema.sql` con tablas, PK/FK y constraints.
+- [ ] `data.sql`: roles base (Admin, Guarda, Funcionario), permisos mínimos (`crear_usuario`, `registrar_visita`, `generar_reporte`, `bloquear_persona` + los adicionales que se necesiten: `aprobar_visita`, `checkin_visita`, `checkout_visita`, `editar_persona`), usuarios de ejemplo por rol, empresas y personas de ejemplo.
+- [ ] Levantar el contenedor (`docker compose up -d`), correr los scripts, validar en DBeaver.
 - [ ] Diagrama Entidad-Relación (DBeaver ER Diagram o similar) para el README.
 - **Commit:** `feat(db): agregar schema y data de PostgreSQL`
 
@@ -78,27 +79,25 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-03 · Login y autenticación `[CRÍTICA]`
 **Como** usuario del sistema (Guarda/Funcionario/Admin), **quiero** iniciar sesión con usuario y contraseña, **para** acceder solo a las funciones de mi rol.
-- [x] Slice `usuarios`: entidades `Usuario`, `Rol`, `Permiso`.
-- [x] Puerto `UsuarioRepository` + adaptador JDBC.
-- [x] `ConexionPostgres` como **Singleton**.
-- [x] `AutenticarUsuarioService` (valida credenciales, distingue éxito/fallo).
-- [x] UI de login con `JOptionPane`.
-- [x] **TODO HU-05 conectado:** 4 caminos de login ahora registran en bitacora_auditoria (usuario no existe, password incorrecto, usuario inactivo, login exitoso) con detalles específicos; mensaje genérico al usuario se mantiene por seguridad.
+- [ ] Slice `usuarios`: entidades `Usuario`, `Rol`, `Permiso`.
+- [ ] Puerto `UsuarioRepository` + adaptador JDBC.
+- [ ] `ConexionPostgres` como **Singleton**.
+- [ ] `AutenticarUsuarioService` (valida credenciales, distingue éxito/fallo).
+- [ ] UI de login con `JOptionPane`.
 - **Commit:** `feat(rbac): entidades de usuarios roles y permisos`, `feat(rbac): servicio de autenticación`
 
 ### HU-04 · Autorización por permisos `[CRÍTICA]`
 **Como** sistema, **quiero** verificar que el rol del usuario tenga el permiso exacto antes de ejecutar cualquier acción crítica, **para** cumplir con RBAC y denegar accesos no autorizados con un mensaje claro.
-- [x] `AutorizarAccionService`: recibe usuario + código de permiso, valida contra BD.
-- [x] Excepción de dominio `AccesoDenegadoException` con mensaje claro para la UI.
-- [x] Aplicar la verificación como punto de entrada obligatorio de cada caso de uso posterior (no opcional).
-- [x] **TODO HU-05 conectado:** camino de denegación registra AUTORIZACION_DENEGADA en bitacora_auditoria con detalle "username=X permiso=Y"; caminos exitosos NO se auditan aquí (decisión HU-04).
+- [ ] `AutorizarAccionService`: recibe usuario + código de permiso, valida contra BD.
+- [ ] Excepción de dominio `AccesoDenegadoException` con mensaje claro para la UI.
+- [ ] Aplicar la verificación como punto de entrada obligatorio de cada caso de uso posterior (no opcional).
 - **Commit:** `feat(rbac): validación de autorización por permiso`
 
 ### HU-05 · Bitácora de auditoría `[CRÍTICA]`
 **Como** administrador, **quiero** que cada acción crítica quede registrada en una bitácora inmutable, **para** poder investigar incidentes y cumplir con trazabilidad.
-- [x] Slice `auditoria`: entidad `BitacoraAuditoria`, puerto + adaptador JDBC.
-- [x] `AuditoriaService.registrar(usuario, accion, entidad, detalle, resultado)`.
-- [x] Integrarlo ya en login (éxito/fallo) y dejar el gancho listo para todos los servicios que vienen.
+- [ ] Slice `auditoria`: entidad `BitacoraAuditoria`, puerto + adaptador JDBC.
+- [ ] `AuditoriaService.registrar(usuario, accion, entidad, detalle, resultado)`.
+- [ ] Integrarlo ya en login (éxito/fallo) y dejar el gancho listo para todos los servicios que vienen.
 - **Commit:** `feat(auditoria): servicio de bitácora de auditoría`
 
 ---
@@ -107,25 +106,22 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-06 · Gestión de personas y empresas `[ALTA]`
 **Como** funcionario o admin, **quiero** registrar y consultar personas (trabajadores/invitados) y empresas, **para** tener la base de datos de quién puede circular por el complejo.
-- [x] Slice `personas`: entidades `Persona`, `Empresa`, `TipoPersona`.
-- [x] CRUD protegido por permisos RBAC (permiso `editar_persona`).
-- [x] Cada operación dispara auditoría (CREAR_EMPRESA, CREAR_PERSONA, ACTUALIZAR_PERSONA con EXITO/FALLO; listar NO audita por ser lectura).
-- [x] `EntidadDuplicadaException` genérica en `shared` para duplicados.
-- [x] Ajuste permisos: GUARDA sin `editar_persona` (solo FUNCIONARIO y ADMIN).
+- [ ] Slice `personas`: entidades `Persona`, `Empresa`.
+- [ ] CRUD protegido por permisos RBAC.
+- [ ] Cada operación dispara auditoría.
 - **Commit:** `feat(personas): CRUD de personas y empresas con RBAC y auditoría`
 
 ### HU-07 · Pre-registro de invitado `[ALTA]`
 **Como** funcionario de empresa, **quiero** pre-registrar a un invitado con fecha/hora de visita, **para** que su ingreso quede aprobado de antemano.
-- [ ] Slice `visitas`: entidad `Visita`.
-- [ ] `PreRegistrarInvitadoService` → estado `APROBADA`.
+- [x] Slice `visitas`: entidad `Visita`.
+- [x] `PreRegistrarInvitadoService` → estado `APROBADA`.
 - **Commit:** `feat(visitas): pre-registro de invitados`
 
 ### HU-08 · Check-in del invitado pre-registrado `[ALTA]`
 **Como** guarda de seguridad, **quiero** buscar al invitado por documento y ver su foto, empresa y autorización, **para** dejarlo ingresar rápidamente.
-- [ ] `BuscarPersonaParaCheckInService`.
-- [ ] `RegistrarCheckInService` (estado → `DENTRO`).
-- [ ] UI de búsqueda/check-in para el Guarda.
-- [ ] Auditoría del check-in.
+- [x] `RegistrarCheckInService` (estado → `DENTRO`).
+- [x] UI de búsqueda/check-in para el Guarda (`CheckInView`).
+- [x] Auditoría del check-in.
 - **Commit:** `feat(visitas): check-in de invitado aprobado`
 
 ---
@@ -199,7 +195,8 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 **Como** evaluador del proyecto, **quiero** un README claro y completo, **para** entender, instalar y ejecutar el sistema sin ayuda externa.
 - [ ] Descripción del proyecto (problema + solución).
 - [ ] Modelo de la BD + diagrama ER.
-- [ ] Decisiones de diseño: dónde y por qué SOLID, Singleton y Observer (+ patrones extra si se agregaron).
+- [ ] Decisiones de diseño: dónde y por qué SOLID + los 5 patrones (Singleton, Observer, Repository, Strategy, Factory Method).
+- [ ] Nota explícita: por qué se usó Hexagonal + Vertical Slice+ (confirmado con el profesor como obligatorio) en vez de la mención a "MVC" del documento oficial de entregables.
 - [ ] Instalación y ejecución: JDK 25, Maven, `docker compose up -d` para Postgres, correr `schema.sql`/`data.sql`, compilar y ejecutar.
 - [ ] Guía de uso con credenciales de ejemplo por cada rol.
 - **Commit:** `docs(readme): documentación completa del proyecto`
