@@ -1,5 +1,7 @@
 package com.acme.sica.visitas.infrastructure;
 
+import com.acme.sica.personas.application.PersonaRepository;
+import com.acme.sica.personas.domain.Persona;
 import com.acme.sica.visitas.application.AprobarORechazarVisitaService;
 import com.acme.sica.visitas.application.NotificadorVisitas;
 import com.acme.sica.visitas.application.VisitaObserver;
@@ -24,6 +26,7 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
 
     private final Usuario funcionarioActual;
     private final VisitaRepository visitaRepository;
+    private final PersonaRepository personaRepository;
     private final AprobarORechazarVisitaService aprobarORechazarService;
     private final NotificadorVisitas notificadorVisitas;
 
@@ -35,10 +38,12 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
 
     public FuncionarioPendientesView(Usuario funcionarioActual,
                                      VisitaRepository visitaRepository,
+                                     PersonaRepository personaRepository,
                                      AprobarORechazarVisitaService aprobarORechazarService,
                                      NotificadorVisitas notificadorVisitas) {
         this.funcionarioActual = funcionarioActual;
         this.visitaRepository = visitaRepository;
+        this.personaRepository = personaRepository;
         this.aprobarORechazarService = aprobarORechazarService;
         this.notificadorVisitas = notificadorVisitas;
 
@@ -102,12 +107,21 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
     }
 
 private void agregarFila(Visita v) {
+        String nombrePersona = "";
+        String documento = "";
+        String nombreEmpresa = "";
+        var personaOpt = personaRepository.buscarPorId(v.getPersonaId());
+        if (personaOpt.isPresent()) {
+            Persona p = personaOpt.get();
+            nombrePersona = p.getNombre();
+            documento = p.getDocumento();
+        }
         tableModel.addRow(new Object[]{
                 v.getId(),
-                v.getPersonaId(), // se podr\u00eda resolver nombre con join, simplificado
-                "doc-" + v.getPersonaId(), // placeholder
+                nombrePersona,
+                documento,
                 v.getEmpresaVisitadaId() != null ? "emp-" + v.getEmpresaVisitadaId() : "\u2014",
-                "reciente", // creadoEn no est\u00e1 en el dominio, se muestra placeholder
+                v.getFechaHoraProgramada() != null ? v.getFechaHoraProgramada().toString() : "\u2014",
                 v.getEstado().name()
         });
     }

@@ -22,6 +22,7 @@ import com.acme.sica.usuarios.application.AutorizarAccionService;
 import com.acme.sica.usuarios.application.UsuarioRepository;
 import com.acme.sica.usuarios.domain.Usuario;
 import com.acme.sica.usuarios.infrastructure.LoginView;
+import com.acme.sica.usuarios.infrastructure.PantallaPrincipal;
 import com.acme.sica.usuarios.infrastructure.UsuarioRepositoryJdbc;
 import com.acme.sica.visitas.application.AprobarORechazarVisitaService;
 import com.acme.sica.visitas.application.NotificadorVisitas;
@@ -123,13 +124,19 @@ public class Main {
                     new GenerarReporteBitacoraService(autorizarAccionService, bitacoraRepository,
                             usuarioRepository, auditoriaService);
 
-            // Decisión de integración: CheckInView y LoginView son piezas independientes
-            // que se prueban por separado. La navegación real por rol (Guarda → CheckInView,
-            // Funcionario → pantalla de aprobaciones, Admin → panel) se hará en HU-16.
-            // Por ahora lanzamos LoginView; CheckInView se puede probar comentando LoginView
-            // y descomentando la línea de abajo.
-            new LoginView(autenticarUsuarioService).mostrar();
-            // new CheckInView(registrarCheckInService, autenticarUsuarioService.autenticar("guarda1", "1234")).mostrar();
+            // HU-16: Login + navegacion por rol
+            new LoginView(autenticarUsuarioService).mostrar()
+                    .ifPresent(usuario -> new PantallaPrincipal(
+                            usuario,
+                            personaRepository, empresaRepository, usuarioRepository,
+                            visitaRepository, bitacoraRepository, notificadorVisitas,
+                            registrarCheckInService, registrarCheckOutService,
+                            registrarIngresoPorOlvidoService, preRegistrarInvitadoService,
+                            aprobarORechazarService, crearPersonaService, crearEmpresaService,
+                            actualizarPersonaService, listarPersonasPorEmpresaService,
+                            registrarIncidenteService, bloquearPersonaService,
+                            generarReporteVisitasDentroService, generarReporteBitacoraService
+                    ).mostrar());
         });
     }
 }

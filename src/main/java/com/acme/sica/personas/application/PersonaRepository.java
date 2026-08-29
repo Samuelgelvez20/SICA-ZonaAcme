@@ -11,4 +11,6 @@ public interface PersonaRepository {
     Optional<Persona> buscarPorDocumento(String documento);
     Optional<Persona> buscarPorId(Long id);
     List<Persona> listarPorEmpresa(Long empresaId);
+
+    List<Persona> listarTodas();
 }
