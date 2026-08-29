@@ -19,7 +19,10 @@ import com.acme.sica.usuarios.infrastructure.LoginView;
 import com.acme.sica.usuarios.infrastructure.UsuarioRepositoryJdbc;
 import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
+import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.application.VisitaRepository;
+import com.acme.sica.visitas.domain.ReglaValidacionIngreso;
+import com.acme.sica.visitas.domain.ValidacionIngresoNoAnunciado;
 import com.acme.sica.visitas.infrastructure.CheckInView;
 import com.acme.sica.visitas.infrastructure.VisitaRepositoryJdbc;
 
@@ -59,6 +62,13 @@ public class Main {
             RegistrarCheckInService registrarCheckInService =
                     new RegistrarCheckInService(autorizarAccionService, personaRepository,
                             visitaRepository, auditoriaService);
+
+            // HU-09: Registro de visita no anunciada (Strategy inyectado)
+            ReglaValidacionIngreso validacionNoAnunciada = new ValidacionIngresoNoAnunciado();
+            RegistrarVisitaNoAnunciadaService registrarVisitaNoAnunciadaService =
+                    new RegistrarVisitaNoAnunciadaService(autorizarAccionService, personaRepository,
+                            crearPersonaService, visitaRepository, auditoriaService,
+                            validacionNoAnunciada);
 
             // Decisión de integración: CheckInView y LoginView son piezas independientes
             // que se prueban por separado. La navegación real por rol (Guarda → CheckInView,
