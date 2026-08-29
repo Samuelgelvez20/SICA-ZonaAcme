@@ -46,5 +46,30 @@ public final class VisitaFactory {
         return visita;
     }
 
-    // NO se agregan aún crearNoAnunciada ni crearPorOlvido (HU-09 y HU-11)
+    /**
+     * Crea una visita por ingreso no anunciado (invitado sin cita previa).
+     *
+     * @param personaId         ID de la persona (ya registrada o reci\u00e9n creada)
+     * @param guardaId          ID del guarda que registra el ingreso
+     * @param funcionarioId     ID del funcionario anfitri\u00f3n de la empresa visitada
+     * @param empresaVisitadaId ID de la empresa que recibe la visita
+     * @return Visita en estado {@link EstadoVisita#PENDIENTE_APROBACION},
+     * {@code fechaHoraProgramada = null}, {@code fechaHoraIngreso = null},
+     * {@code fechaHoraSalida = null}, {@code motivo = "Ingreso no anunciado"}
+     */
+    public static Visita crearNoAnunciada(Long personaId, Long guardaId,
+                                          Long funcionarioId, Long empresaVisitadaId) {
+        Visita visita = new Visita();
+        visita.setPersonaId(personaId);
+        visita.setGuardaId(guardaId);
+        visita.setFuncionarioId(funcionarioId);
+        visita.setEmpresaVisitadaId(empresaVisitadaId);
+        visita.setFechaHoraProgramada(null);
+        visita.setFechaHoraIngreso(null);
+        visita.setEstado(EstadoVisita.PENDIENTE_APROBACION);
+        visita.setMotivo("Ingreso no anunciado");
+        return visita;
+    }
+
+    // NO se agrega aún crearPorOlvido (HU-11)
 }
