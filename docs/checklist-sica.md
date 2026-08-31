@@ -57,20 +57,20 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-01 · Estructura base del proyecto `[CRÍTICA]`
 **Como** desarrollador, **quiero** tener el repositorio y el proyecto Maven configurados con Git Flow, **para** empezar a desarrollar sobre una base ordenada.
-- [ ] Crear repo privado en GitHub, agregar a `trainingLeader` como colaborador.
-- [ ] `git flow init` (o estructura manual `main`/`develop`).
-- [ ] Proyecto Maven con `pom.xml` (dependencia driver JDBC PostgreSQL).
-- [ ] Paquetes por slice: `usuarios`, `personas`, `visitas`, `incidentes`, `reportes`, `auditoria`, `shared`, `config`, `ui`.
-- [ ] `docker-compose.yml` con el servicio de PostgreSQL.
+- [x] Crear repo privado en GitHub, agregar a `trainingLeader` como colaborador.
+- [x] `git flow init` (o estructura manual `main`/`develop`).
+- [x] Proyecto Maven con `pom.xml` (dependencia driver JDBC PostgreSQL).
+- [x] Paquetes por slice: `usuarios`, `personas`, `visitas`, `incidentes`, `reportes`, `auditoria`, `shared`, `config`, `ui`.
+- [x] `docker-compose.yml` con el servicio de PostgreSQL.
 - **Commit:** `chore: estructura base del proyecto Maven y docker-compose de postgres`
 
 ### HU-02 · Modelo de base de datos `[CRÍTICA]`
 **Como** equipo del proyecto, **quiero** un modelo de datos claro y consistente, **para** que todos los módulos posteriores tengan dónde persistir su información.
-- [ ] Confirmar/ajustar el modelo de la sección 2.
-- [ ] `schema.sql` con tablas, PK/FK y constraints.
-- [ ] `data.sql`: roles base (Admin, Guarda, Funcionario), permisos mínimos (`crear_usuario`, `registrar_visita`, `generar_reporte`, `bloquear_persona` + los adicionales que se necesiten: `aprobar_visita`, `checkin_visita`, `checkout_visita`, `editar_persona`), usuarios de ejemplo por rol, empresas y personas de ejemplo.
-- [ ] Levantar el contenedor (`docker compose up -d`), correr los scripts, validar en DBeaver.
-- [ ] Diagrama Entidad-Relación (DBeaver ER Diagram o similar) para el README.
+- [x] Confirmar/ajustar el modelo de la sección 2.
+- [x] `schema.sql` con tablas, PK/FK y constraints.
+- [x] `data.sql`: roles base (Admin, Guarda, Funcionario), permisos mínimos (`crear_usuario`, `registrar_visita`, `generar_reporte`, `bloquear_persona` + los adicionales que se necesiten: `aprobar_visita`, `checkin_visita`, `checkout_visita`, `editar_persona`), usuarios de ejemplo por rol, empresas y personas de ejemplo.
+- [x] Levantar el contenedor (`docker compose up -d`), correr los scripts, validar en DBeaver.
+- [x] Diagrama Entidad-Relación (DBeaver ER Diagram o similar) para el README.
 - **Commit:** `feat(db): agregar schema y data de PostgreSQL`
 
 ---
@@ -79,25 +79,25 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-03 · Login y autenticación `[CRÍTICA]`
 **Como** usuario del sistema (Guarda/Funcionario/Admin), **quiero** iniciar sesión con usuario y contraseña, **para** acceder solo a las funciones de mi rol.
-- [ ] Slice `usuarios`: entidades `Usuario`, `Rol`, `Permiso`.
-- [ ] Puerto `UsuarioRepository` + adaptador JDBC.
-- [ ] `ConexionPostgres` como **Singleton**.
-- [ ] `AutenticarUsuarioService` (valida credenciales, distingue éxito/fallo).
-- [ ] UI de login con `JOptionPane`.
+- [x] Slice `usuarios`: entidades `Usuario`, `Rol`, `Permiso`.
+- [x] Puerto `UsuarioRepository` + adaptador JDBC.
+- [x] `ConexionPostgres` como **Singleton**.
+- [x] `AutenticarUsuarioService` (valida credenciales, distingue éxito/fallo).
+- [x] UI de login con `JOptionPane`.
 - **Commit:** `feat(rbac): entidades de usuarios roles y permisos`, `feat(rbac): servicio de autenticación`
 
 ### HU-04 · Autorización por permisos `[CRÍTICA]`
 **Como** sistema, **quiero** verificar que el rol del usuario tenga el permiso exacto antes de ejecutar cualquier acción crítica, **para** cumplir con RBAC y denegar accesos no autorizados con un mensaje claro.
-- [ ] `AutorizarAccionService`: recibe usuario + código de permiso, valida contra BD.
-- [ ] Excepción de dominio `AccesoDenegadoException` con mensaje claro para la UI.
-- [ ] Aplicar la verificación como punto de entrada obligatorio de cada caso de uso posterior (no opcional).
+- [x] `AutorizarAccionService`: recibe usuario + código de permiso, valida contra BD.
+- [x] Excepción de dominio `AccesoDenegadoException` con mensaje claro para la UI.
+- [x] Aplicar la verificación como punto de entrada obligatorio de cada caso de uso posterior (no opcional).
 - **Commit:** `feat(rbac): validación de autorización por permiso`
 
 ### HU-05 · Bitácora de auditoría `[CRÍTICA]`
 **Como** administrador, **quiero** que cada acción crítica quede registrada en una bitácora inmutable, **para** poder investigar incidentes y cumplir con trazabilidad.
-- [ ] Slice `auditoria`: entidad `BitacoraAuditoria`, puerto + adaptador JDBC.
-- [ ] `AuditoriaService.registrar(usuario, accion, entidad, detalle, resultado)`.
-- [ ] Integrarlo ya en login (éxito/fallo) y dejar el gancho listo para todos los servicios que vienen.
+- [x] Slice `auditoria`: entidad `BitacoraAuditoria`, puerto + adaptador JDBC.
+- [x] `AuditoriaService.registrar(usuario, accion, entidad, detalle, resultado)`.
+- [x] Integrarlo ya en login (éxito/fallo) y dejar el gancho listo para todos los servicios que vienen.
 - **Commit:** `feat(auditoria): servicio de bitácora de auditoría`
 
 ---
@@ -106,9 +106,9 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-06 · Gestión de personas y empresas `[ALTA]`
 **Como** funcionario o admin, **quiero** registrar y consultar personas (trabajadores/invitados) y empresas, **para** tener la base de datos de quién puede circular por el complejo.
-- [ ] Slice `personas`: entidades `Persona`, `Empresa`.
-- [ ] CRUD protegido por permisos RBAC.
-- [ ] Cada operación dispara auditoría.
+- [x] Slice `personas`: entidades `Persona`, `Empresa`.
+- [x] CRUD protegido por permisos RBAC.
+- [x] Cada operación dispara auditoría.
 - **Commit:** `feat(personas): CRUD de personas y empresas con RBAC y auditoría`
 
 ### HU-07 · Pre-registro de invitado `[ALTA]`
