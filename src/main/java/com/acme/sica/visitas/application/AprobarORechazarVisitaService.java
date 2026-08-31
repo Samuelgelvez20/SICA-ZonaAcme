@@ -31,11 +31,19 @@ public class AprobarORechazarVisitaService {
         autorizarAccionService.verificar(usuarioActual, "aprobar_visita");
 
         // b) Buscar visita y validar estado
-        Visita visita = visitaRepository.buscarPorId(visitaId)
-                .orElseThrow(() -> new VisitaNoDecidibleException("Visita no encontrada: " + visitaId));
+        Visita visita = visitaRepository.buscarPorId(visitaId).orElse(null);
+        if (visita == null) {
+            auditoriaService.registrar(usuarioActual.getId(), "APROBAR_VISITA", "visitas",
+                    "Intento de decidir sobre visita " + visitaId + " que no existe o ya fue decidida",
+                    ResultadoAuditoria.FALLO);
+            throw new VisitaNoDecidibleException("Visita no encontrada: " + visitaId);
+        }
 
         if (visita.getEstado() != EstadoVisita.PENDIENTE_APROBACION
                 && visita.getEstado() != EstadoVisita.PENDIENTE_APROBACION_OLVIDO) {
+            auditoriaService.registrar(usuarioActual.getId(), "APROBAR_VISITA", "visitas",
+                    "Intento de decidir sobre visita " + visitaId + " que no existe o ya fue decidida",
+                    ResultadoAuditoria.FALLO);
             throw VisitaNoDecidibleException.estadoNoValido(visitaId, visita.getEstado().name());
         }
 
@@ -60,11 +68,19 @@ public class AprobarORechazarVisitaService {
         autorizarAccionService.verificar(usuarioActual, "aprobar_visita"); // mismo permiso
 
         // b) Buscar visita y validar estado
-        Visita visita = visitaRepository.buscarPorId(visitaId)
-                .orElseThrow(() -> new VisitaNoDecidibleException("Visita no encontrada: " + visitaId));
+        Visita visita = visitaRepository.buscarPorId(visitaId).orElse(null);
+        if (visita == null) {
+            auditoriaService.registrar(usuarioActual.getId(), "RECHAZAR_VISITA", "visitas",
+                    "Intento de decidir sobre visita " + visitaId + " que no existe o ya fue decidida",
+                    ResultadoAuditoria.FALLO);
+            throw new VisitaNoDecidibleException("Visita no encontrada: " + visitaId);
+        }
 
         if (visita.getEstado() != EstadoVisita.PENDIENTE_APROBACION
                 && visita.getEstado() != EstadoVisita.PENDIENTE_APROBACION_OLVIDO) {
+            auditoriaService.registrar(usuarioActual.getId(), "RECHAZAR_VISITA", "visitas",
+                    "Intento de decidir sobre visita " + visitaId + " que no existe o ya fue decidida",
+                    ResultadoAuditoria.FALLO);
             throw VisitaNoDecidibleException.estadoNoValido(visitaId, visita.getEstado().name());
         }
 
