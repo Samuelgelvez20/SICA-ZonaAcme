@@ -180,23 +180,23 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-14 · Registro de incidentes y bloqueo de personas `[MEDIA]`
 **Como** admin o funcionario con permiso, **quiero** registrar un incidente y poder bloquear a una persona, **para** impedir su ingreso futuro hasta que se resuelva.
-- [ ] Slice `incidentes`: entidad `Incidente`, `RegistrarIncidenteService`, `BloquearPersonaService` (permiso `bloquear_persona`).
-- [ ] El check-in debe impedir el ingreso si la persona está bloqueada, mostrando el motivo.
-- [ ] Auditoría en cada registro/bloqueo.
+- [x] Slice `incidentes`: entidad `Incidente`, `RegistrarIncidenteService`, `BloquearPersonaService` (permiso `bloquear_persona`).
+- [x] El check-in debe impedir el ingreso si la persona está bloqueada, mostrando el motivo.
+- [x] Auditoría en cada registro/bloqueo.
 - **Commit:** `feat(incidentes): registro de incidentes y bloqueo de personas`
 
 ### HU-15 · Reportes `[MEDIA]`
 **Como** admin, **quiero** ver quién está actualmente dentro del complejo y consultar la bitácora filtrada, **para** apoyar una evacuación o una investigación.
-- [ ] Reporte de personas `DENTRO` en tiempo real.
-- [ ] Consulta de bitácora filtrable por fecha/usuario/acción.
-- [ ] Uso explícito de **Streams/lambdas** (filtrar, agrupar, ordenar).
+- [x] Reporte de personas `DENTRO` en tiempo real.
+- [x] Consulta de bitácora filtrable por fecha/usuario/acción.
+- [x] Uso explícito de **Streams/lambdas** (filtrar, agrupar, ordenar).
 - **Commit:** `feat(reportes): reporte de personas dentro y consulta de bitácora`
 
 ### HU-16 · Integración de pantallas por rol `[MEDIA]`
 **Como** cualquier usuario, **quiero** ver solo las opciones correspondientes a mi rol tras iniciar sesión, **para** tener una experiencia clara y consistente.
-- [ ] Pantalla principal condicionada por rol (Guarda / Funcionario / Admin).
-- [ ] Validaciones consistentes con `JOptionPane` (campos vacíos, numéricos, nulos).
-- [ ] Revisión cruzada: confirmar que TODAS las operaciones críticas llaman a `AuditoriaService`.
+- [x] Pantalla principal condicionada por rol (Guarda / Funcionario / Admin).
+- [x] Validaciones consistentes con `JOptionPane` (campos vacíos, numéricos, nulos).
+- [x] Revisión cruzada: confirmar que TODAS las operaciones críticas llaman a `AuditoriaService`.
 - **Commit:** `feat(ui): integración de pantallas por rol`, `fix(*): correcciones de validación`
 
 ---
@@ -205,27 +205,27 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ### HU-17 · README completo `[ALTA]`
 **Como** evaluador del proyecto, **quiero** un README claro y completo, **para** entender, instalar y ejecutar el sistema sin ayuda externa.
-- [ ] Descripción del proyecto (problema + solución).
-- [ ] Modelo de la BD + diagrama ER.
-- [ ] Decisiones de diseño: dónde y por qué SOLID + los 5 patrones (Singleton, Observer, Repository, Strategy, Factory Method).
-- [ ] Nota explícita: por qué se usó Hexagonal + Vertical Slice+ (confirmado con el profesor como obligatorio) en vez de la mención a "MVC" del documento oficial de entregables.
-- [ ] Instalación y ejecución: JDK 25, Maven, `docker compose up -d` para Postgres, correr `schema.sql`/`data.sql`, compilar y ejecutar.
-- [ ] Guía de uso con credenciales de ejemplo por cada rol.
+- [x] Descripción del proyecto (problema + solución).
+- [x] Modelo de la BD + diagrama ER.
+- [x] Decisiones de diseño: dónde y por qué SOLID + los 5 patrones (Singleton, Observer, Repository, Strategy, Factory Method).
+- [x] Nota explícita: por qué se usó Hexagonal + Vertical Slice+ (confirmado con el profesor como obligatorio) en vez de la mención a "MVC" del documento oficial de entregables.
+- [x] Instalación y ejecución: JDK 25, Maven, `docker compose up -d` para Postgres, correr `schema.sql`/`data.sql`, compilar y ejecutar.
+- [x] Guía de uso con credenciales de ejemplo por cada rol.
 - **Commit:** `docs(readme): documentación completa del proyecto`
 
 ### HU-18 · QA manual `[BAJA]`
 **Como** desarrollador, **quiero** probar los 4 flujos completos y el RBAC de punta a punta, **para** asegurar que todo lo pedido funciona antes de entregar.
-- [ ] Probar los 4 flujos (pre-registrado, no anunciado, olvido de carnet, salida olvidada) + check-out normal.
-- [ ] Probar RBAC: acción sin permiso → mensaje de denegación correcto.
-- [ ] Verificar que la bitácora registra TODO lo exigido por el documento.
+- [x] Probar los 4 flujos (pre-registrado, no anunciado, olvido de carnet, salida olvidada) + check-out normal.
+- [x] Probar RBAC: acción sin permiso → mensaje de denegación correcto.
+- [x] Verificar que la bitácora registra TODO lo exigido por el documento.
 - **Commit:** ajustes finales `fix(...)` si aparecen bugs.
 
 ### HU-19 · Cierre y entrega `[BAJA]`
 **Como** desarrollador, **quiero** cerrar el repositorio ordenadamente, **para** entregar un proyecto profesional.
-- [ ] Merge final `develop` → `main`, tag `v1.0.0`.
-- [ ] Confirmar acceso de `trainingLeader` al repo.
-- [ ] Confirmar que `schema.sql`, `data.sql` y `README.md` están en la raíz.
-- [ ] Enviar el enlace del repositorio.
+- [x] Merge final `develop` → `main`, tag `v1.0.0`.
+- [x] Confirmar acceso de `trainingLeader` al repo.
+- [x] Confirmar que `schema.sql`, `data.sql` y `README.md` están en la raíz.
+- [x] Enviar el enlace del repositorio.
 
 ---
 
