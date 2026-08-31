@@ -1,6 +1,5 @@
 package com.acme.sica.visitas.infrastructure;
 
-import com.acme.sica.personas.domain.Persona;
 import com.acme.sica.usuarios.domain.Usuario;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
 import com.acme.sica.visitas.domain.Visita;

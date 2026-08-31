@@ -124,7 +124,7 @@ public class Main {
                     .ifPresent(usuario -> new PantallaPrincipal(
                             usuario,
                             personaRepository, empresaRepository, usuarioRepository,
-                            visitaRepository, bitacoraRepository, notificadorVisitas,
+                            visitaRepository, notificadorVisitas,
                             registrarCheckInService, registrarCheckOutService,
                             registrarIngresoPorOlvidoService, preRegistrarInvitadoService,
                             aprobarORechazarService, crearPersonaService, crearEmpresaService,

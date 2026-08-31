@@ -1,6 +1,5 @@
 package com.acme.sica.usuarios.infrastructure;
 
-import com.acme.sica.auditoria.application.BitacoraRepository;
 import com.acme.sica.incidentes.application.IncidenteRepository;
 import com.acme.sica.incidentes.application.RegistrarIncidenteService;
 import com.acme.sica.personas.application.BloquearPersonaService;
@@ -40,7 +39,6 @@ public class PantallaPrincipal extends JFrame {
     private final EmpresaRepository empresaRepository;
     private final UsuarioRepository usuarioRepository;
     private final VisitaRepository visitaRepository;
-    private final BitacoraRepository bitacoraRepository;
     private final NotificadorVisitas notificadorVisitas;
 
     private final RegistrarCheckInService registrarCheckInService;
@@ -62,7 +60,6 @@ public class PantallaPrincipal extends JFrame {
                               EmpresaRepository empresaRepository,
                               UsuarioRepository usuarioRepository,
                               VisitaRepository visitaRepository,
-                              BitacoraRepository bitacoraRepository,
                               NotificadorVisitas notificadorVisitas,
                               RegistrarCheckInService registrarCheckInService,
                               RegistrarCheckOutService registrarCheckOutService,
@@ -82,7 +79,6 @@ public class PantallaPrincipal extends JFrame {
         this.empresaRepository = empresaRepository;
         this.usuarioRepository = usuarioRepository;
         this.visitaRepository = visitaRepository;
-        this.bitacoraRepository = bitacoraRepository;
         this.notificadorVisitas = notificadorVisitas;
         this.registrarCheckInService = registrarCheckInService;
         this.registrarCheckOutService = registrarCheckOutService;
