@@ -35,12 +35,7 @@ import com.acme.sica.visitas.application.VisitaRepository;
 import com.acme.sica.visitas.domain.ReglaValidacionIngreso;
 import com.acme.sica.visitas.domain.ValidacionIngresoNoAnunciado;
 import com.acme.sica.visitas.domain.ValidacionIngresoPorOlvido;
-import com.acme.sica.visitas.infrastructure.CheckInView;
-import com.acme.sica.visitas.infrastructure.CheckOutView;
-import com.acme.sica.visitas.infrastructure.FuncionarioPendientesView;
-import com.acme.sica.visitas.infrastructure.IngresoPorOlvidoView;
 import com.acme.sica.visitas.infrastructure.NotificadorVisitasEnMemoria;
-import com.acme.sica.visitas.infrastructure.PanelEsperaGuarda;
 import com.acme.sica.visitas.infrastructure.VisitaRepositoryJdbc;
 
 import javax.swing.SwingUtilities;
