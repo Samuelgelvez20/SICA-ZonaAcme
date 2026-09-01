@@ -124,13 +124,14 @@ public class Main {
                     .ifPresent(usuario -> new PantallaPrincipal(
                             usuario,
                             personaRepository, empresaRepository, usuarioRepository,
-                            visitaRepository, bitacoraRepository, notificadorVisitas,
+                            visitaRepository, notificadorVisitas,
                             registrarCheckInService, registrarCheckOutService,
                             registrarIngresoPorOlvidoService, preRegistrarInvitadoService,
                             aprobarORechazarService, crearPersonaService, crearEmpresaService,
                             actualizarPersonaService, listarPersonasPorEmpresaService,
                             registrarIncidenteService, bloquearPersonaService,
-                            generarReporteVisitasDentroService, generarReporteBitacoraService
+                            generarReporteVisitasDentroService, generarReporteBitacoraService,
+                            registrarVisitaNoAnunciadaService
                     ).mostrar());
         });
     }

@@ -18,22 +18,6 @@ public class Visita {
     public Visita() {
     }
 
-    public Visita(Long id, Long personaId, Long guardaId, Long funcionarioId,
-                  Long empresaVisitadaId, LocalDateTime fechaHoraProgramada,
-                  LocalDateTime fechaHoraIngreso, LocalDateTime fechaHoraSalida,
-                  EstadoVisita estado, String motivo) {
-        this.id = id;
-        this.personaId = personaId;
-        this.guardaId = guardaId;
-        this.funcionarioId = funcionarioId;
-        this.empresaVisitadaId = empresaVisitadaId;
-        this.fechaHoraProgramada = fechaHoraProgramada;
-        this.fechaHoraIngreso = fechaHoraIngreso;
-        this.fechaHoraSalida = fechaHoraSalida;
-        this.estado = estado;
-        this.motivo = motivo;
-    }
-
     public Long getId() {
         return id;
     }

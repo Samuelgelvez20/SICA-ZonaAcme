@@ -6,8 +6,7 @@ import com.acme.sica.usuarios.domain.Usuario;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 
 /**
  * Pantalla simple para que el Guarda registre un ingreso por carnet olvidado.
