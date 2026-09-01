@@ -130,7 +130,8 @@ public class Main {
                             aprobarORechazarService, crearPersonaService, crearEmpresaService,
                             actualizarPersonaService, listarPersonasPorEmpresaService,
                             registrarIncidenteService, bloquearPersonaService,
-                            generarReporteVisitasDentroService, generarReporteBitacoraService
+                            generarReporteVisitasDentroService, generarReporteBitacoraService,
+                            registrarVisitaNoAnunciadaService
                     ).mostrar());
         });
     }

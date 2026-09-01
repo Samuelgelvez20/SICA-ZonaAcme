@@ -19,14 +19,19 @@ import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
 import com.acme.sica.visitas.application.RegistrarCheckOutService;
 import com.acme.sica.visitas.application.RegistrarIngresoPorOlvidoService;
+import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.application.VisitaRepository;
 import com.acme.sica.visitas.infrastructure.CheckInView;
 import com.acme.sica.visitas.infrastructure.CheckOutView;
 import com.acme.sica.visitas.infrastructure.IngresoPorOlvidoView;
 import com.acme.sica.visitas.infrastructure.FuncionarioPendientesView;
+import com.acme.sica.visitas.infrastructure.PanelEsperaGuarda;
+import com.acme.sica.visitas.infrastructure.RegistroNoAnunciadoView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Pantalla principal de navegación condicionada por rol.
@@ -54,6 +59,9 @@ public class PantallaPrincipal extends JFrame {
     private final BloquearPersonaService bloquearPersonaService;
     private final GenerarReporteVisitasDentroService generarReporteVisitasDentroService;
     private final GenerarReporteBitacoraService generarReporteBitacoraService;
+    private final RegistrarVisitaNoAnunciadaService registrarVisitaNoAnunciadaService;
+
+    private PanelEsperaGuarda panelEsperaGuarda;
 
     public PantallaPrincipal(Usuario usuarioActual,
                               PersonaRepository personaRepository,
@@ -73,7 +81,8 @@ public class PantallaPrincipal extends JFrame {
                               RegistrarIncidenteService registrarIncidenteService,
                               BloquearPersonaService bloquearPersonaService,
                               GenerarReporteVisitasDentroService generarReporteVisitasDentroService,
-                              GenerarReporteBitacoraService generarReporteBitacoraService) {
+                              GenerarReporteBitacoraService generarReporteBitacoraService,
+                              RegistrarVisitaNoAnunciadaService registrarVisitaNoAnunciadaService) {
         this.usuarioActual = usuarioActual;
         this.personaRepository = personaRepository;
         this.empresaRepository = empresaRepository;
@@ -93,6 +102,7 @@ public class PantallaPrincipal extends JFrame {
         this.bloquearPersonaService = bloquearPersonaService;
         this.generarReporteVisitasDentroService = generarReporteVisitasDentroService;
         this.generarReporteBitacoraService = generarReporteBitacoraService;
+        this.registrarVisitaNoAnunciadaService = registrarVisitaNoAnunciadaService;
 
         initUI();
     }
@@ -122,6 +132,7 @@ public class PantallaPrincipal extends JFrame {
             addBoton(panelBotones, "Check-in", e -> abrirCheckIn());
             addBoton(panelBotones, "Check-out", e -> abrirCheckOut());
             addBoton(panelBotones, "Ingreso por Olvido", e -> abrirIngresoPorOlvido());
+            addBoton(panelBotones, "Ingreso No Anunciado", e -> abrirIngresoNoAnunciado());
         }
 
         if (rol.equals("FUNCIONARIO") || rol.equals("ADMIN")) {
@@ -131,7 +142,8 @@ public class PantallaPrincipal extends JFrame {
             addBoton(panelBotones, "Bloquear Persona", e -> abrirBloqueo());
         }
 
-        if (rol.equals("ADMIN")) {
+        // editar_persona permission: GUARDA, FUNCIONARIO, ADMIN (per data.sql)
+        if (rol.equals("GUARDA") || rol.equals("FUNCIONARIO") || rol.equals("ADMIN")) {
             addBoton(panelBotones, "Gestionar Personas", e -> abrirPersonas());
             addBoton(panelBotones, "Gestionar Empresas", e -> abrirEmpresas());
         }
@@ -143,6 +155,13 @@ public class PantallaPrincipal extends JFrame {
 
         add(panelBotones, BorderLayout.CENTER);
 
+        // Panel de espera para GUARDA/ADMIN (HU-10)
+        if (rol.equals("GUARDA") || rol.equals("ADMIN")) {
+            panelEsperaGuarda = new PanelEsperaGuarda(usuarioActual, notificadorVisitas,
+                    registrarCheckInService, personaRepository);
+            add(panelEsperaGuarda, BorderLayout.SOUTH);
+        }
+
         // Panel inferior: cerrar sesión
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
@@ -152,6 +171,16 @@ public class PantallaPrincipal extends JFrame {
         });
         panelInferior.add(btnCerrarSesion);
         add(panelInferior, BorderLayout.SOUTH);
+
+        // Cleanup al cerrar ventana principal
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (panelEsperaGuarda != null) {
+                    panelEsperaGuarda.cerrar();
+                }
+            }
+        });
     }
 
     private void addBoton(JPanel panel, String texto, java.awt.event.ActionListener action) {
@@ -176,6 +205,15 @@ public class PantallaPrincipal extends JFrame {
         frame.setSize(500, 200);
         frame.setLocationRelativeTo(null);
         frame.add(new IngresoPorOlvidoView(usuarioActual, registrarIngresoPorOlvidoService));
+        frame.setVisible(true);
+    }
+
+    private void abrirIngresoNoAnunciado() {
+        JFrame frame = new JFrame("SICA - Ingreso No Anunciado");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(600, 500);
+        frame.setLocationRelativeTo(null);
+        frame.add(new RegistroNoAnunciadoView(usuarioActual, registrarVisitaNoAnunciadaService, personaRepository));
         frame.setVisible(true);
     }
 
@@ -294,7 +332,7 @@ public class PantallaPrincipal extends JFrame {
 
     private void abrirPersonas() {
         new PersonasView(usuarioActual, personaRepository, empresaRepository,
-                crearPersonaService, actualizarPersonaService).mostrar();
+                crearPersonaService, actualizarPersonaService, listarPersonasPorEmpresaService).mostrar();
     }
 
     private void abrirEmpresas() {
