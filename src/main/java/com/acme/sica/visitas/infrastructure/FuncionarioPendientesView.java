@@ -26,7 +26,6 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
     private final VisitaRepository visitaRepository;
     private final PersonaRepository personaRepository;
     private final AprobarORechazarVisitaService aprobarORechazarService;
-    private final NotificadorVisitas notificadorVisitas;
 
     private final DefaultTableModel tableModel;
     private final JTable table;
@@ -43,7 +42,6 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
         this.visitaRepository = visitaRepository;
         this.personaRepository = personaRepository;
         this.aprobarORechazarService = aprobarORechazarService;
-        this.notificadorVisitas = notificadorVisitas;
 
         setTitle("SICA - Solicitudes Pendientes (" + funcionarioActual.getNombre() + ")");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

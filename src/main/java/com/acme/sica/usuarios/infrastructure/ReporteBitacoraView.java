@@ -3,7 +3,6 @@ package com.acme.sica.usuarios.infrastructure;
 import com.acme.sica.reportes.application.FiltrosBitacora;
 import com.acme.sica.reportes.application.GenerarReporteBitacoraService;
 import com.acme.sica.reportes.application.ReporteBitacora;
-import com.acme.sica.usuarios.application.UsuarioRepository;
 import com.acme.sica.usuarios.domain.Usuario;
 
 import javax.swing.*;
