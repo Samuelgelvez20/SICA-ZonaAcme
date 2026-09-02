@@ -12,8 +12,6 @@ import com.acme.sica.usuarios.domain.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
@@ -28,7 +26,6 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
     private final VisitaRepository visitaRepository;
     private final PersonaRepository personaRepository;
     private final AprobarORechazarVisitaService aprobarORechazarService;
-    private final NotificadorVisitas notificadorVisitas;
 
     private final DefaultTableModel tableModel;
     private final JTable table;
@@ -45,7 +42,6 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
         this.visitaRepository = visitaRepository;
         this.personaRepository = personaRepository;
         this.aprobarORechazarService = aprobarORechazarService;
-        this.notificadorVisitas = notificadorVisitas;
 
         setTitle("SICA - Solicitudes Pendientes (" + funcionarioActual.getNombre() + ")");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -109,7 +105,6 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
 private void agregarFila(Visita v) {
         String nombrePersona = "";
         String documento = "";
-        String nombreEmpresa = "";
         var personaOpt = personaRepository.buscarPorId(v.getPersonaId());
         if (personaOpt.isPresent()) {
             Persona p = personaOpt.get();

@@ -20,7 +20,6 @@ import com.acme.sica.reportes.application.GenerarReporteVisitasDentroService;
 import com.acme.sica.usuarios.application.AutenticarUsuarioService;
 import com.acme.sica.usuarios.application.AutorizarAccionService;
 import com.acme.sica.usuarios.application.UsuarioRepository;
-import com.acme.sica.usuarios.domain.Usuario;
 import com.acme.sica.usuarios.infrastructure.LoginView;
 import com.acme.sica.usuarios.infrastructure.PantallaPrincipal;
 import com.acme.sica.usuarios.infrastructure.UsuarioRepositoryJdbc;
