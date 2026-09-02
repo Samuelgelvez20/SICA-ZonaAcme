@@ -39,4 +39,14 @@ public interface VisitaRepository {
      * Util para reporte de personas actualmente dentro del complejo.
      */
     List<Visita> listarVisitasDentro();
+
+    /**
+     * Lista las ultimas visitas registradas por un guarda, ordenadas por
+     * creacion descendente. Incluye todos los estados (pendientes, decididas,
+     * dentro, cerradas). Util para el panel de notificaciones del Guarda.
+     *
+     * @param guardaId ID del guarda
+     * @return lista de visitas (maximo 20)
+     */
+    List<Visita> listarPorGuarda(Long guardaId);
 }

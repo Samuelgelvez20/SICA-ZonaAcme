@@ -95,7 +95,7 @@ com.acme.sica/
 |---------|-----------|-------------|
 | **Singleton** | `config/ConexionPostgres` | Una sola conexión a PostgreSQL compartida por todos los repositorios |
 | **Repository** | `*Repository` + `*RepositoryJdbc` | Puertos de dominio (interfaces) + adaptadores JDBC (implementaciones). Separa dominio de persistencia |
-| **Observer** | `VisitaObserver` + `NotificadorVisitasEnMemoria` | Notificación asíncrona cuando un guarda registra una solicitud pendiente. Usa `CopyOnWriteArrayList` + `ExecutorService` (2 hilos) |
+| **Observer** | `VisitaObserver` + `NotificadorVisitasEnMemoria` + `PanelNotificacionesGuarda` | Notificación asíncrona cuando un guarda registra una solicitud pendiente. Modelo híbrido: Observer en memoria (tiempo real, mismo proceso) + consulta directa a BD vía `listarPorGuarda` (siempre funciona, procesos separados). Usa `CopyOnWriteArrayList` + `ExecutorService` (2 hilos) |
 | **Strategy** | `ReglaValidacionIngreso` + `ValidacionIngresoNoAnunciado` + `ValidacionIngresoPorOlvido` | Cada flujo de ingreso tiene su propia regla de validación. El servicio decide cuál usar |
 | **Factory Method** | `VisitaFactory` | Cada tipo de visita (pre-registrada, no anunciada, por olvido) se crea con un método estático específico |
 
@@ -237,6 +237,7 @@ O desde IntelliJ/VS Code: ejecutar `Main.java`.
 4. Sistema crea la visita en PENDIENTE_APROBACION
 5. Funcionario recibe notificación en tiempo real
 6. Funcionario aprueba o rechaza desde "Solicitudes Pendientes"
+7. Guarda ve el resultado en "Mis Notificaciones" (panel persistente con tabla)
 ```
 
 ### Flujo 3: Carnet olvidado (Guarda → Funcionario)
@@ -247,6 +248,7 @@ O desde IntelliJ/VS Code: ejecutar `Main.java`.
 3. Ingresar documento del trabajador
 4. Sistema crea la visita en PENDIENTE_APROBACION_OLVIDO
 5. Funcionario aprueba o rechaza desde "Solicitudes Pendientes"
+6. Guarda ve el resultado en "Mis Notificaciones" (panel persistente con tabla)
 ```
 
 ### Flujo 4: Salida olvidada (Automático)
@@ -265,6 +267,9 @@ O desde IntelliJ/VS Code: ejecutar `Main.java`.
 | Check-in | ✅ | — | ✅ |
 | Check-out | ✅ | — | ✅ |
 | Ingreso por Olvido | ✅ | — | ✅ |
+| Ingreso No Anunciado | ✅ | — | ✅ |
+| Ingreso de Trabajador | ✅ | — | ✅ |
+| Mis Notificaciones | ✅ | — | ✅ |
 | Solicitudes Pendientes | ✅ | ✅ | — |
 | Pre-registrar Invitado | ✅ | ✅ | — |
 | Registrar Incidente | ✅ | ✅ | — |

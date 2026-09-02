@@ -95,4 +95,26 @@ public final class VisitaFactory {
         visita.setMotivo("Carnet olvidado");
         return visita;
     }
+
+    /**
+     * Crea una visita por ingreso directo de trabajador con carnet.
+     *
+     * @param personaId   ID del trabajador (ya registrado)
+     * @param guardaId    ID del guarda que registra el ingreso
+     * @param empresaId   ID de la empresa del trabajador
+     * @return Visita en estado {@link EstadoVisita#DENTRO}, con
+     * {@code fechaHoraIngreso = LocalDateTime.now()},
+     * {@code motivo = "Ingreso directo con carnet"}
+     */
+    public static Visita crearIngresoDirecto(Long personaId, Long guardaId, Long empresaId) {
+        Visita visita = new Visita();
+        visita.setPersonaId(personaId);
+        visita.setGuardaId(guardaId);
+        visita.setEmpresaVisitadaId(empresaId);
+        visita.setFechaHoraProgramada(null);
+        visita.setFechaHoraIngreso(LocalDateTime.now());
+        visita.setEstado(EstadoVisita.DENTRO);
+        visita.setMotivo("Ingreso directo con carnet");
+        return visita;
+    }
 }

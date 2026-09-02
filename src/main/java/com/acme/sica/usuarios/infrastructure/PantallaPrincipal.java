@@ -1,6 +1,5 @@
 package com.acme.sica.usuarios.infrastructure;
 
-import com.acme.sica.incidentes.application.IncidenteRepository;
 import com.acme.sica.incidentes.application.RegistrarIncidenteService;
 import com.acme.sica.personas.application.BloquearPersonaService;
 import com.acme.sica.personas.application.EmpresaRepository;
@@ -19,13 +18,15 @@ import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
 import com.acme.sica.visitas.application.RegistrarCheckOutService;
 import com.acme.sica.visitas.application.RegistrarIngresoPorOlvidoService;
+import com.acme.sica.visitas.application.RegistrarIngresoTrabajadorService;
 import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.application.VisitaRepository;
 import com.acme.sica.visitas.infrastructure.CheckInView;
 import com.acme.sica.visitas.infrastructure.CheckOutView;
 import com.acme.sica.visitas.infrastructure.IngresoPorOlvidoView;
 import com.acme.sica.visitas.infrastructure.FuncionarioPendientesView;
-import com.acme.sica.visitas.infrastructure.PanelEsperaGuarda;
+import com.acme.sica.visitas.infrastructure.IngresoTrabajadorView;
+import com.acme.sica.visitas.infrastructure.PanelNotificacionesGuarda;
 import com.acme.sica.visitas.infrastructure.RegistroNoAnunciadoView;
 
 import javax.swing.*;
@@ -60,8 +61,9 @@ public class PantallaPrincipal extends JFrame {
     private final GenerarReporteVisitasDentroService generarReporteVisitasDentroService;
     private final GenerarReporteBitacoraService generarReporteBitacoraService;
     private final RegistrarVisitaNoAnunciadaService registrarVisitaNoAnunciadaService;
+    private final RegistrarIngresoTrabajadorService registrarIngresoTrabajadorService;
 
-    private PanelEsperaGuarda panelEsperaGuarda;
+    private PanelNotificacionesGuarda panelNotificacionesGuarda;
 
     public PantallaPrincipal(Usuario usuarioActual,
                               PersonaRepository personaRepository,
@@ -82,7 +84,8 @@ public class PantallaPrincipal extends JFrame {
                               BloquearPersonaService bloquearPersonaService,
                               GenerarReporteVisitasDentroService generarReporteVisitasDentroService,
                               GenerarReporteBitacoraService generarReporteBitacoraService,
-                              RegistrarVisitaNoAnunciadaService registrarVisitaNoAnunciadaService) {
+                              RegistrarVisitaNoAnunciadaService registrarVisitaNoAnunciadaService,
+                              RegistrarIngresoTrabajadorService registrarIngresoTrabajadorService) {
         this.usuarioActual = usuarioActual;
         this.personaRepository = personaRepository;
         this.empresaRepository = empresaRepository;
@@ -103,6 +106,7 @@ public class PantallaPrincipal extends JFrame {
         this.generarReporteVisitasDentroService = generarReporteVisitasDentroService;
         this.generarReporteBitacoraService = generarReporteBitacoraService;
         this.registrarVisitaNoAnunciadaService = registrarVisitaNoAnunciadaService;
+        this.registrarIngresoTrabajadorService = registrarIngresoTrabajadorService;
 
         initUI();
     }
@@ -133,6 +137,8 @@ public class PantallaPrincipal extends JFrame {
             addBoton(panelBotones, "Check-out", e -> abrirCheckOut());
             addBoton(panelBotones, "Ingreso por Olvido", e -> abrirIngresoPorOlvido());
             addBoton(panelBotones, "Ingreso No Anunciado", e -> abrirIngresoNoAnunciado());
+            addBoton(panelBotones, "Ingreso de Trabajador", e -> abrirIngresoTrabajador());
+            addBoton(panelBotones, "Mis Notificaciones", e -> abrirNotificaciones());
         }
 
         if (rol.equals("FUNCIONARIO") || rol.equals("ADMIN")) {
@@ -155,14 +161,13 @@ public class PantallaPrincipal extends JFrame {
 
         add(panelBotones, BorderLayout.CENTER);
 
-        // Panel de espera para GUARDA/ADMIN (HU-10)
+        // Panel de notificaciones para GUARDA/ADMIN (HU-10) - suscripcion automatica en segundo plano
         if (rol.equals("GUARDA") || rol.equals("ADMIN")) {
-            panelEsperaGuarda = new PanelEsperaGuarda(usuarioActual, notificadorVisitas,
-                    registrarCheckInService, personaRepository);
-            add(panelEsperaGuarda, BorderLayout.SOUTH);
+            panelNotificacionesGuarda = new PanelNotificacionesGuarda(usuarioActual,
+                    visitaRepository, personaRepository, notificadorVisitas, registrarCheckInService);
         }
 
-        // Panel inferior: cerrar sesión
+        // Panel inferior: cerrar sesion
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
         btnCerrarSesion.addActionListener(e -> {
@@ -176,8 +181,8 @@ public class PantallaPrincipal extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (panelEsperaGuarda != null) {
-                    panelEsperaGuarda.cerrar();
+                if (panelNotificacionesGuarda != null) {
+                    panelNotificacionesGuarda.cerrar();
                 }
             }
         });
@@ -213,8 +218,24 @@ public class PantallaPrincipal extends JFrame {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(600, 500);
         frame.setLocationRelativeTo(null);
-        frame.add(new RegistroNoAnunciadoView(usuarioActual, registrarVisitaNoAnunciadaService, personaRepository));
+        frame.add(new RegistroNoAnunciadoView(usuarioActual, registrarVisitaNoAnunciadaService,
+                personaRepository, usuarioRepository));
         frame.setVisible(true);
+    }
+
+    private void abrirIngresoTrabajador() {
+        JFrame frame = new JFrame("SICA - Ingreso de Trabajador");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(500, 200);
+        frame.setLocationRelativeTo(null);
+        frame.add(new IngresoTrabajadorView(usuarioActual, registrarIngresoTrabajadorService));
+        frame.setVisible(true);
+    }
+
+    private void abrirNotificaciones() {
+        if (panelNotificacionesGuarda != null) {
+            panelNotificacionesGuarda.setVisible(true);
+        }
     }
 
     private void abrirPendientes() {
@@ -344,7 +365,7 @@ public class PantallaPrincipal extends JFrame {
     }
 
     private void abrirReporteBitacora() {
-        new ReporteBitacoraView(usuarioActual, generarReporteBitacoraService, usuarioRepository).mostrar();
+        new ReporteBitacoraView(usuarioActual, generarReporteBitacoraService).mostrar();
     }
 
     public void mostrar() {
