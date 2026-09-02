@@ -12,8 +12,6 @@ import com.acme.sica.usuarios.domain.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
@@ -109,7 +107,6 @@ public class FuncionarioPendientesView extends JFrame implements VisitaObserver 
 private void agregarFila(Visita v) {
         String nombrePersona = "";
         String documento = "";
-        String nombreEmpresa = "";
         var personaOpt = personaRepository.buscarPorId(v.getPersonaId());
         if (personaOpt.isPresent()) {
             Persona p = personaOpt.get();

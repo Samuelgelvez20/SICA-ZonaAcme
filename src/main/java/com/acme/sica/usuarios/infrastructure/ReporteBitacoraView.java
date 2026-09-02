@@ -19,7 +19,6 @@ public class ReporteBitacoraView extends JFrame {
 
     private final Usuario usuarioActual;
     private final GenerarReporteBitacoraService service;
-    private final UsuarioRepository usuarioRepository;
 
     private final DefaultTableModel tableModel;
     private final JTable table;
@@ -30,11 +29,9 @@ public class ReporteBitacoraView extends JFrame {
     private final JLabel lblTotal;
 
     public ReporteBitacoraView(Usuario usuarioActual,
-                                GenerarReporteBitacoraService service,
-                                UsuarioRepository usuarioRepository) {
+                                GenerarReporteBitacoraService service) {
         this.usuarioActual = usuarioActual;
         this.service = service;
-        this.usuarioRepository = usuarioRepository;
 
         setTitle("SICA - Reporte: Bitacora de Auditoria");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

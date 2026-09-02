@@ -6,7 +6,6 @@ import com.acme.sica.personas.application.CrearPersonaService;
 import com.acme.sica.personas.application.PersonaRepository;
 import com.acme.sica.personas.domain.Persona;
 import com.acme.sica.personas.domain.TipoPersona;
-import com.acme.sica.shared.PersonaNoEncontradaException;
 import com.acme.sica.shared.ValidacionIngresoException;
 import com.acme.sica.usuarios.application.AutorizarAccionService;
 import com.acme.sica.usuarios.domain.Usuario;

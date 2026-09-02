@@ -2,7 +2,6 @@ package com.acme.sica.personas.application;
 
 import com.acme.sica.auditoria.application.AuditoriaService;
 import com.acme.sica.auditoria.domain.ResultadoAuditoria;
-import com.acme.sica.shared.AccesoDenegadoException;
 import com.acme.sica.shared.EntidadDuplicadaException;
 import com.acme.sica.usuarios.application.AutorizarAccionService;
 import com.acme.sica.usuarios.domain.Usuario;

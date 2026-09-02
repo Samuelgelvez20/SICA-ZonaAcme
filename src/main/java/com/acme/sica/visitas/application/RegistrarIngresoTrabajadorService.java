@@ -3,7 +3,6 @@ package com.acme.sica.visitas.application;
 import com.acme.sica.auditoria.application.AuditoriaService;
 import com.acme.sica.auditoria.domain.ResultadoAuditoria;
 import com.acme.sica.personas.application.PersonaRepository;
-import com.acme.sica.personas.domain.Persona;
 import com.acme.sica.personas.domain.TipoPersona;
 import com.acme.sica.shared.PersonaBloqueadaException;
 import com.acme.sica.shared.PersonaNoEncontradaException;

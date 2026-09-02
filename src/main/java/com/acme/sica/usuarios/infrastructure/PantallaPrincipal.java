@@ -1,6 +1,5 @@
 package com.acme.sica.usuarios.infrastructure;
 
-import com.acme.sica.incidentes.application.IncidenteRepository;
 import com.acme.sica.incidentes.application.RegistrarIncidenteService;
 import com.acme.sica.personas.application.BloquearPersonaService;
 import com.acme.sica.personas.application.EmpresaRepository;
@@ -360,7 +359,7 @@ public class PantallaPrincipal extends JFrame {
     }
 
     private void abrirReporteBitacora() {
-        new ReporteBitacoraView(usuarioActual, generarReporteBitacoraService, usuarioRepository).mostrar();
+        new ReporteBitacoraView(usuarioActual, generarReporteBitacoraService).mostrar();
     }
 
     public void mostrar() {
