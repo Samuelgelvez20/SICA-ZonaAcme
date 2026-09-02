@@ -229,13 +229,108 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 
 ---
 
+## Correcciones post-QA
+
+Las siguientes modificaciones surgieron durante las pruebas manuales de QA
+y corresponden a extensiones/correcciones posteriores al cierre funcional
+inicial de las 19 historias. NO formaban parte del alcance original y
+fueron integradas en `develop` después del merge `develop → main` con
+tag `v1.0.0`.
+
+### Extensión de UI para HU-09 — Vista de ingreso no anunciado
+
+Se implementó `RegistroNoAnunciadoView.java` como interfaz Swing completa
+para el flujo de ingreso no anunciado (extensión de UI de HU-09):
+
+- Búsqueda de persona por documento (`personaRepository.buscarPorDocumento`).
+- Manejo de persona existente: muestra nombre, tipo y empresa.
+- Creación de datos para persona no registrada: formulario completo con
+  nombre, tipo, foto URL y empresa ID.
+- Selección de funcionario anfitrión mediante `JComboBox<Usuario>` filtrado
+  por rol FUNCIONARIO y estado activo.
+- Selección/ingreso de empresa visitada (campo obligatorio).
+- Uso de `SwingWorker` para no bloquear la UI durante búsqueda y registro.
+- Integración con `RegistrarVisitaNoAnunciadaService` existente.
+- Integración en `PantallaPrincipal` como botón "Ingreso No Anunciado"
+  visible para GUARDA y ADMIN.
+- Solicitud enviada al funcionario con estado `PENDIENTE_APROBACION`.
+
+**Corrección posterior:** Se reemplazó el campo manual de ID de funcionario
+(`JTextField`) por un `JComboBox<Usuario>` que lista los funcionarios
+activos del sistema, eliminando errores de selección manual y
+auto-seleccionando el funcionario asociado a la persona buscada.
+
+**Commits:** `066d9d8` (vista inicial), `08b70b8` (fix dropdown).
+
+### Ingreso directo de trabajador con carnet
+
+Se agregó un flujo post-QA para trabajadores con carnet válido que permite
+ingreso directo sin pasar por aprobación:
+
+```
+TRABAJADOR + carnet válido → ingreso directo → estado DENTRO
+```
+
+Componentes implementados:
+
+- `RegistrarIngresoTrabajadorService.java`: servicio que autoriza con
+  permiso `checkin_visita`, busca persona por documento, valida que sea
+  tipo TRABAJADOR (rechaza INVITADO), verifica bloqueo, regulariza
+  salidas olvidadas y crea la visita directamente en estado `DENTRO`.
+- `IngresoTrabajadorView.java`: interfaz Swing con campo documento + botón
+  "Registrar Ingreso", usa `SwingWorker` y `JOptionPane`.
+- `VisitaFactory.crearIngresoDirecto()`: factory method que crea visita
+  con estado `DENTRO`, motivo "Ingreso directo con carnet" y
+  `fechaHoraIngreso = LocalDateTime.now()`.
+- Integración en el menú del GUARDA en `PantallaPrincipal` como botón
+  "Ingreso de Trabajador".
+
+Reglas de negocio:
+
+- Autorización mediante `checkin_visita`.
+- Solo/TRABAJADOR permitido; INVITADO rechazado con `ValidacionIngresoException`.
+- Persona bloqueada → `PersonaBloqueadaException.conMotivo()`.
+- Regularización automática de salida olvidada: cierra visita `DENTRO`
+  anterior como `CERRADA_POR_SISTEMA_SALIDA_OLVIDADA` con auditoría
+  separada.
+- Auditoría completa: `INGRESO_DIRECTO_TRABAJADOR` (éxito/fallo),
+  `INGRESO_DIRECTO_PERSONA_BLOQUEADA` (fallo).
+
+Esta funcionalidad fue incorporada como extensión post-QA y no
+corresponde a una HU adicional dentro de las 19 historias originales.
+
+**Commit:** `d3ba7dc`.
+
+### Correcciones de gestión de personas y empresas
+
+Se realizaron correcciones y extensiones sobre la gestión existente de
+personas y empresas (HU-06):
+
+- **Filtro por empresa:** `JComboBox<Empresa>` en `PersonasView` que
+  permite filtrar personas por empresa o mostrar todas.
+- **Integración de `ListarPersonasPorEmpresaService`:** el filtro
+  utiliza el servicio existente que verifica permiso `editar_persona`.
+- **Edición de personas:** botón "Editar" en `PersonasView` que abre
+  diálogo con todos los campos de la persona y actualiza mediante
+  `ActualizarPersonaService`.
+- **Corrección de cableado:** se ajustó el constructor de `PersonasView`
+  para aceptar `ListarPersonasPorEmpresaService` como parámetro,
+  resolviendo un bug de compilación pre-existente en `develop` donde
+  `PantallaPrincipal` pasaba 6 argumentos a un constructor de 5.
+
+Estas son correcciones/extensiones post-QA sobre la gestión existente.
+
+**Commit:** `add285c`.
+
+---
+
 ## BONUS (solo si sobra tiempo, sin sacrificar lo anterior)
 
 **Técnico:**
 - [ ] Explorar Spring Boot + WebSocket para la notificación en tiempo real.
 - [ ] Pruebas unitarias con JUnit (autenticación, RBAC, flujo de visitas).
-- [ ] Patrón Strategy para reglas de validación de ingreso.
-- [ ] Patrón Factory Method para creación de `Visita` según el flujo de origen.
+- [x] Patrón Strategy para reglas de validación de ingreso. Implementado en `domain/ReglaValidacionIngreso` (interfaz), `ValidacionIngresoNoAnunciado` (HU-09) y `ValidacionIngresoPorOlvido` (HU-11). Utilizado en `RegistrarVisitaNoAnunciadaService` y `RegistrarIngresoPorOlvidoService`.
+- [x] Patrón Factory Method para creación de `Visita` según el flujo de origen. Implementado en `domain/VisitaFactory` con 4 métodos: `crearPreRegistrada` (HU-07), `crearNoAnunciada` (HU-09), `crearPorOlvido` (HU-11), `crearIngresoDirecto` (post-QA).
 - [ ] Comparar JDBC puro vs Hibernate/JPA.
 - [ ] Dockerizar también la aplicación (no solo la BD).
 
