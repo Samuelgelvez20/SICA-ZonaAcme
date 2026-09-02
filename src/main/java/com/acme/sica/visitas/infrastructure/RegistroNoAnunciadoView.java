@@ -3,9 +3,10 @@ package com.acme.sica.visitas.infrastructure;
 import com.acme.sica.personas.application.PersonaRepository;
 import com.acme.sica.personas.domain.Persona;
 import com.acme.sica.personas.domain.TipoPersona;
+import com.acme.sica.usuarios.application.UsuarioRepository;
+import com.acme.sica.usuarios.domain.Usuario;
 import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.domain.Visita;
-import com.acme.sica.usuarios.domain.Usuario;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -26,6 +27,7 @@ public class RegistroNoAnunciadoView extends JPanel {
     private final Usuario guardaActual;
     private final RegistrarVisitaNoAnunciadaService registrarService;
     private final PersonaRepository personaRepository;
+    private final UsuarioRepository usuarioRepository;
 
     // Paso 1: búsqueda
     private final JTextField txtDocumento;
@@ -40,7 +42,7 @@ public class RegistroNoAnunciadoView extends JPanel {
     private final JComboBox<TipoPersona> cmbTipo;
     private final JTextField txtFotoUrl;
     private final JTextField txtEmpresaId;
-    private final JTextField txtFuncionarioId;
+    private final JComboBox<Usuario> cmbFuncionario;
     private final JTextField txtEmpresaVisitadaId;
     private final JButton btnRegistrar;
     private final JLabel lblStatus;
@@ -51,10 +53,12 @@ public class RegistroNoAnunciadoView extends JPanel {
 
     public RegistroNoAnunciadoView(Usuario guardaActual,
                                     RegistrarVisitaNoAnunciadaService registrarService,
-                                    PersonaRepository personaRepository) {
+                                    PersonaRepository personaRepository,
+                                    UsuarioRepository usuarioRepository) {
         this.guardaActual = guardaActual;
         this.registrarService = registrarService;
         this.personaRepository = personaRepository;
+        this.usuarioRepository = usuarioRepository;
 
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createTitledBorder(
@@ -97,9 +101,10 @@ public class RegistroNoAnunciadoView extends JPanel {
         txtEmpresaId = new JTextField();
         panelDatosPersona.add(txtEmpresaId);
 
-        panelDatosPersona.add(new JLabel("Funcionario Anfitrión ID (obligatorio):"));
-        txtFuncionarioId = new JTextField();
-        panelDatosPersona.add(txtFuncionarioId);
+        panelDatosPersona.add(new JLabel("Funcionario Anfitrión (obligatorio):"));
+        cmbFuncionario = new JComboBox<>();
+        cargarFuncionarios();
+        panelDatosPersona.add(cmbFuncionario);
 
         panelDatosPersona.add(new JLabel("Empresa Visitada ID (obligatorio):"));
         txtEmpresaVisitadaId = new JTextField();
@@ -128,6 +133,31 @@ public class RegistroNoAnunciadoView extends JPanel {
 
         // Enter en campo documento dispara búsqueda
         txtDocumento.addActionListener(this::onBuscar);
+    }
+
+    private void cargarFuncionarios() {
+        cmbFuncionario.removeAllItems();
+        for (Usuario u : usuarioRepository.listarTodos()) {
+            if (u.isActivo() && "FUNCIONARIO".equals(u.getRol().getNombre())) {
+                cmbFuncionario.addItem(u);
+            }
+        }
+    }
+
+    private void seleccionarFuncionarioPorPersona(Persona persona) {
+        if (persona.getFuncionarioAnfitrionId() != null) {
+            for (int i = 0; i < cmbFuncionario.getItemCount(); i++) {
+                Usuario u = cmbFuncionario.getItemAt(i);
+                if (u.getId().equals(persona.getFuncionarioAnfitrionId())) {
+                    cmbFuncionario.setSelectedIndex(i);
+                    return;
+                }
+            }
+        }
+        // Si no se encontró o es null, seleccionar el primero por defecto
+        if (cmbFuncionario.getItemCount() > 0) {
+            cmbFuncionario.setSelectedIndex(0);
+        }
     }
 
     private void onBuscar(ActionEvent e) {
@@ -167,6 +197,9 @@ public class RegistroNoAnunciadoView extends JPanel {
                             panelDatosPersona.remove(cmbTipo);
                         }
 
+                        // Auto-seleccionar funcionario basado en la persona
+                        seleccionarFuncionarioPorPersona(p);
+
                         lblStatus.setText("Persona encontrada. Complete funcionario y empresa visitada.");
                     } else {
                         // Persona NO existe - mostrar formulario de creación
@@ -183,7 +216,7 @@ public class RegistroNoAnunciadoView extends JPanel {
 
                     panelDatosPersona.setVisible(true);
                     btnRegistrar.setEnabled(true);
-                    txtFuncionarioId.requestFocusInWindow();
+                    cmbFuncionario.requestFocusInWindow();
                     revalidate();
                     repaint();
 
@@ -211,8 +244,8 @@ public class RegistroNoAnunciadoView extends JPanel {
         panelDatosPersona.add(txtFotoUrl);
         panelDatosPersona.add(new JLabel("Empresa ID (opcional):"));
         panelDatosPersona.add(txtEmpresaId);
-        panelDatosPersona.add(new JLabel("Funcionario Anfitrión ID (obligatorio):"));
-        panelDatosPersona.add(txtFuncionarioId);
+        panelDatosPersona.add(new JLabel("Funcionario Anfitrión (obligatorio):"));
+        panelDatosPersona.add(cmbFuncionario);
         panelDatosPersona.add(new JLabel("Empresa Visitada ID (obligatorio):"));
         panelDatosPersona.add(txtEmpresaVisitadaId);
         panelDatosPersona.add(new JLabel(""));
@@ -229,9 +262,9 @@ public class RegistroNoAnunciadoView extends JPanel {
             return;
         }
 
-        String funcionarioIdStr = txtFuncionarioId.getText().trim();
-        if (funcionarioIdStr.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "El funcionario anfitrión es obligatorio",
+        Usuario funcionarioSeleccionado = (Usuario) cmbFuncionario.getSelectedItem();
+        if (funcionarioSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un funcionario anfitrión",
                     "Campo requerido", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -246,15 +279,14 @@ public class RegistroNoAnunciadoView extends JPanel {
         btnRegistrar.setEnabled(false);
         lblStatus.setText("Registrando ingreso...");
 
-        Long funcionarioId;
+        Long funcionarioId = funcionarioSeleccionado.getId();
         Long empresaVisitadaId;
         try {
-            funcionarioId = Long.parseLong(funcionarioIdStr);
             empresaVisitadaId = Long.parseLong(empresaVisitadaIdStr);
         } catch (NumberFormatException ex) {
             btnRegistrar.setEnabled(true);
-            lblStatus.setText("Error: IDs inválidos");
-            JOptionPane.showMessageDialog(this, "Los IDs deben ser números válidos",
+            lblStatus.setText("Error: ID de empresa inválido");
+            JOptionPane.showMessageDialog(this, "El ID de empresa debe ser un número válido",
                     "Error de formato", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -313,9 +345,11 @@ public class RegistroNoAnunciadoView extends JPanel {
         txtNombre.setText("");
         txtFotoUrl.setText("");
         txtEmpresaId.setText("");
-        txtFuncionarioId.setText("");
         txtEmpresaVisitadaId.setText("");
         cmbTipo.setSelectedItem(TipoPersona.INVITADO);
+        if (cmbFuncionario.getItemCount() > 0) {
+            cmbFuncionario.setSelectedIndex(0);
+        }
 
         personaEncontrada = Optional.empty();
         esPersonaNueva = false;
@@ -346,8 +380,8 @@ public class RegistroNoAnunciadoView extends JPanel {
         panelDatosPersona.add(new JLabel("Empresa ID (opcional):"));
         panelDatosPersona.add(txtEmpresaId);
 
-        panelDatosPersona.add(new JLabel("Funcionario Anfitrión ID (obligatorio):"));
-        panelDatosPersona.add(txtFuncionarioId);
+        panelDatosPersona.add(new JLabel("Funcionario Anfitrión (obligatorio):"));
+        panelDatosPersona.add(cmbFuncionario);
 
         panelDatosPersona.add(new JLabel("Empresa Visitada ID (obligatorio):"));
         panelDatosPersona.add(txtEmpresaVisitadaId);
