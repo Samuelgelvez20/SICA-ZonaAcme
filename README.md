@@ -54,6 +54,9 @@ bitacora_auditoria(id, usuario_id, accion, entidad, detalle,
                    fecha_hora, resultado)
 ```
 
+### Diagrama-ER
+![Diagrama Entidad-Relación de SICA](docs/diagrama-er.png)
+
 **Estados de visita:**
 
 ```
