@@ -145,6 +145,7 @@ Estados de `visitas`: `APROBADA`, `PENDIENTE_APROBACION`, `PENDIENTE_APROBACION_
 - [x] `VisitaNoDecidibleException` en shared (estados no decidibles / ya decididos).
 - [x] `FuncionarioPendientesView` (Swing, `VisitaObserver`, carga inicial con `listarPendientesPorFuncionario`, updates async via `SwingUtilities.invokeLater`).
 - [x] `PanelEsperaGuarda` (Swing, `VisitaObserver`, muestra decisión via `JOptionPane`, ofrece check-in inmediato).
+    - **Evolución post-QA:** reemplazado por `PanelNotificacionesGuarda` (JFrame con JTable persistente + consulta directa a BD).
 - [x] Cableado DI en `Main`: UNA sola instancia `NotificadorVisitasEnMemoria` compartida.
 - [x] Conecta HU-09: `RegistrarVisitaNoAnunciadaService` notifica vía `NotificadorVisitas`.
 - **Commit:** `feat(visitas): HU-10 Observer tiempo real + aprobaciones`
@@ -321,6 +322,37 @@ personas y empresas (HU-06):
 Estas son correcciones/extensiones post-QA sobre la gestión existente.
 
 **Commit:** `add285c`.
+
+### Corrección: Panel de notificaciones del Guarda (modelo híbrido Observer + BD)
+
+El mecanismo original de notificación al Guarda (popup `JOptionPane` emergente
+vía `PanelEsperaGuarda`) solo funcionaba cuando Guarda y Funcionario corren
+en el **mismo proceso JVM** (memoria compartida del `NotificadorVisitasEnMemoria`).
+Si cada terminal es un proceso Java independiente, el Observer nunca disparaba.
+
+**Solución:** Reemplazo de `PanelEsperaGuarda` (JPanel + popup) por
+`PanelNotificacionesGuarda` (JFrame + JTable persistente):
+
+- **Consulta directa a BD** (`VisitaRepository.listarPorGuarda(guardaId)`):
+  funciona siempre, sin importar si corren en procesos separados, porque
+  ambos apuntan a la misma PostgreSQL.
+- **Observer en tiempo real** (mantiene `VisitaObserver`): actualiza la
+  tabla automáticamente cuando Guarda y Funcionario comparten el mismo
+  proceso JVM — complemento optimista, no la fuente de verdad.
+- **Botón "Actualizar"** : re-consulta BD y refresca la tabla completa.
+- **Botón "Check-in"** : habilitado solo para filas con estado `APROBADA`,
+  reutiliza `RegistrarCheckInService`.
+- **Carga automática** : al abrir la pantalla o al presionar Actualizar.
+- **Botón "Mis Notificaciones"** agregado al menú del GUARDA en
+  `PantallaPrincipal`.
+- Nuevo método `listarPorGuarda` en `VisitaRepository` + JDBC
+  (`ORDER BY creado_en DESC LIMIT 20`).
+
+Archivos modificados: `VisitaRepository.java`, `VisitaRepositoryJdbc.java`,
+`PanelNotificacionesGuarda.java` (nuevo), `PantallaPrincipal.java`.
+Archivo eliminado: `PanelEsperaGuarda.java`.
+
+**Commit:** `feat(visitas): panel notificaciones Guarda con modelo híbrido Observer+BD`
 
 ---
 
