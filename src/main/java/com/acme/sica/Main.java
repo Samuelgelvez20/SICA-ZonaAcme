@@ -30,6 +30,7 @@ import com.acme.sica.visitas.application.PreRegistrarInvitadoService;
 import com.acme.sica.visitas.application.RegistrarCheckInService;
 import com.acme.sica.visitas.application.RegistrarCheckOutService;
 import com.acme.sica.visitas.application.RegistrarIngresoPorOlvidoService;
+import com.acme.sica.visitas.application.RegistrarIngresoTrabajadorService;
 import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.application.VisitaRepository;
 import com.acme.sica.visitas.domain.ReglaValidacionIngreso;
@@ -102,6 +103,11 @@ public class Main {
                     new RegistrarCheckOutService(personaRepository, autorizarAccionService,
                             visitaRepository, auditoriaService);
 
+            // Ingreso directo de trabajador con carnet
+            RegistrarIngresoTrabajadorService registrarIngresoTrabajadorService =
+                    new RegistrarIngresoTrabajadorService(personaRepository, autorizarAccionService,
+                            visitaRepository, auditoriaService);
+
             // HU-14: Incidentes y bloqueo de personas
             IncidenteRepository incidenteRepository = new IncidenteRepositoryJdbc();
             RegistrarIncidenteService registrarIncidenteService =
@@ -131,7 +137,8 @@ public class Main {
                             actualizarPersonaService, listarPersonasPorEmpresaService,
                             registrarIncidenteService, bloquearPersonaService,
                             generarReporteVisitasDentroService, generarReporteBitacoraService,
-                            registrarVisitaNoAnunciadaService
+                            registrarVisitaNoAnunciadaService,
+                            registrarIngresoTrabajadorService
                     ).mostrar());
         });
     }
