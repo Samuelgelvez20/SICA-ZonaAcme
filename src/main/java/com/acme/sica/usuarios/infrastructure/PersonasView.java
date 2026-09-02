@@ -69,6 +69,19 @@ public class PersonasView extends JFrame {
         panelFiltro.add(new JLabel("Empresa:"));
         cmbEmpresaFiltro = new JComboBox<>();
         cmbEmpresaFiltro.addItem(null); // "Todas"
+        cmbEmpresaFiltro.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list,
+                    Object value, int index, boolean isSelected, boolean hasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, hasFocus);
+                if (value instanceof com.acme.sica.personas.domain.Empresa empresa) {
+                    setText(empresa.getNombre());
+                } else if (value == null) {
+                    setText("Todas");
+                }
+                return this;
+            }
+        });
         cargarEmpresasEnFiltro();
         panelFiltro.add(cmbEmpresaFiltro);
         JButton btnFiltrar = new JButton("Filtrar");
