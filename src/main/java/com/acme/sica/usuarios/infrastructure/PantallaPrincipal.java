@@ -219,7 +219,8 @@ public class PantallaPrincipal extends JFrame {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(600, 500);
         frame.setLocationRelativeTo(null);
-        frame.add(new RegistroNoAnunciadoView(usuarioActual, registrarVisitaNoAnunciadaService, personaRepository));
+        frame.add(new RegistroNoAnunciadoView(usuarioActual, registrarVisitaNoAnunciadaService,
+                personaRepository, usuarioRepository));
         frame.setVisible(true);
     }
 
