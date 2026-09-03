@@ -38,6 +38,8 @@ Sistema de escritorio en **Java SE 21** que digitaliza el control de acceso de u
 
 ## Modelo de base de datos
 
+### Diagrama Entidad-Relación
+
 ```
 roles(id, nombre)
 permisos(id, codigo, descripcion)
@@ -91,7 +93,7 @@ com.acme.sica/
 
 ### 5 Patrones de diseño
 
-| Patróon | Ubicación | Descripción |
+| Patrón | Ubicación | Descripción |
 |---------|-----------|-------------|
 | **Singleton** | `config/ConexionPostgres` | Una sola conexión a PostgreSQL compartida por todos los repositorios |
 | **Repository** | `*Repository` + `*RepositoryJdbc` | Puertos de dominio (interfaces) + adaptadores JDBC (implementaciones). Separa dominio de persistencia |
@@ -163,6 +165,14 @@ El documento oficial de entregables menciona "MVC" como plantilla genérica, per
 | HU-17 | README completo (este documento) |
 | HU-18 | QA manual |
 | HU-19 | Cierre y entrega |
+
+### Correcciones post-QA
+
+| Corrección | Qué se encontró | Qué se hizo |
+|------------|----------------|-------------|
+| Vista de registro no anunciado | El flujo de ingreso no anunciado no tenía pantalla propia; el guarda no podía ejecutarlo desde la UI | Se creó `NoAnunciadoView` con campo de documento y botón de envío, integrada al menú del guarda |
+| Ingreso directo de trabajador | No existía un flujo para trabajadores con documento en mano que ingresaran directo sin pre-registro ni aprobación | Se implementó `RegistrarIngresoTrabajadorService` + `TrabajadorView`, con validación de tipo TRABAJADOR y regularización automática de salida olvidada |
+| Panel de notificaciones híbrido | El popup original de notificaciones usaba memoria compartida entre procesos, lo que fallaba al cerrar y reabrir el módulo del guarda | Se reemplazó por un panel persistente (`PanelNotificacionesGuarda`) con tabla que combina Observer en memoria + consulta directa a BD, funcionando correctamente en procesos separados |
 
 ---
 
@@ -258,6 +268,22 @@ O desde IntelliJ/VS Code: ejecutar `Main.java`.
 2. Sistema detecta la visita abierta y la cierra automáticamente
    como CERRADA_POR_SISTEMA_SALIDA_OLVIDADA
 3. Nuevo check-in se procesa normalmente
+```
+
+### Flujo 5: Ingreso directo de trabajador (Guarda)
+
+```
+1. Login como guarda1 → PantallaPrincipal (Guarda)
+2. Clic "Ingreso de Trabajador"
+3. Ingresar documento del trabajador (tiene el documento en mano, sin pre-registro)
+4. Sistema valida que la persona exista y sea tipo TRABAJADOR
+5. Si es INVITADO → se rechaza: "Los invitados deben ingresar mediante pre-registro
+   o el flujo de invitado no anunciado"
+6. Si está bloqueado → se rechaza con motivo del bloqueo
+7. Si tiene una visita DENTRO sin cerrar → se cierra automáticamente
+   (regularización de salida olvidada) y se crea la nueva visita
+8. Visita se crea directamente en estado DENTRO (sin esperar aprobación)
+9. Guarda ve confirmación del ingreso en pantalla
 ```
 
 ### RBAC por rol
