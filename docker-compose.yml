@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: sica_user
       POSTGRES_PASSWORD: sica_pass
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - sica_pgdata:/var/lib/postgresql/data
 
