@@ -16,7 +16,7 @@ public class ConexionPostgres {
 
     private ConexionPostgres() {
         this.host     = env("SICA_DB_HOST", "localhost");
-        this.port     = env("SICA_DB_PORT", "5432");
+        this.port     = env("SICA_DB_PORT", "5433");
         this.database = env("SICA_DB_NAME", "sica");
         this.user     = env("SICA_DB_USER", "sica_user");
         this.password = env("SICA_DB_PASSWORD", "sica_pass");
