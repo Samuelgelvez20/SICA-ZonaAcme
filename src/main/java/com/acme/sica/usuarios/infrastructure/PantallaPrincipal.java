@@ -1,13 +1,29 @@
 package com.acme.sica.usuarios.infrastructure;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import com.acme.sica.incidentes.application.RegistrarIncidenteService;
+import com.acme.sica.personas.application.ActualizarPersonaService;
 import com.acme.sica.personas.application.BloquearPersonaService;
-import com.acme.sica.personas.application.EmpresaRepository;
-import com.acme.sica.personas.application.PersonaRepository;
 import com.acme.sica.personas.application.CrearEmpresaService;
 import com.acme.sica.personas.application.CrearPersonaService;
-import com.acme.sica.personas.application.ActualizarPersonaService;
+import com.acme.sica.personas.application.EmpresaRepository;
 import com.acme.sica.personas.application.ListarPersonasPorEmpresaService;
+import com.acme.sica.personas.application.PersonaRepository;
 import com.acme.sica.reportes.application.GenerarReporteBitacoraService;
 import com.acme.sica.reportes.application.GenerarReporteVisitasDentroService;
 import com.acme.sica.usuarios.application.UsuarioRepository;
@@ -23,16 +39,11 @@ import com.acme.sica.visitas.application.RegistrarVisitaNoAnunciadaService;
 import com.acme.sica.visitas.application.VisitaRepository;
 import com.acme.sica.visitas.infrastructure.CheckInView;
 import com.acme.sica.visitas.infrastructure.CheckOutView;
-import com.acme.sica.visitas.infrastructure.IngresoPorOlvidoView;
 import com.acme.sica.visitas.infrastructure.FuncionarioPendientesView;
+import com.acme.sica.visitas.infrastructure.IngresoPorOlvidoView;
 import com.acme.sica.visitas.infrastructure.IngresoTrabajadorView;
 import com.acme.sica.visitas.infrastructure.PanelNotificacionesGuarda;
 import com.acme.sica.visitas.infrastructure.RegistroNoAnunciadoView;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 /**
  * Pantalla principal de navegación condicionada por rol.
@@ -146,6 +157,10 @@ public class PantallaPrincipal extends JFrame {
             addBoton(panelBotones, "Pre-registrar Invitado", e -> abrirPreRegistro());
             addBoton(panelBotones, "Registrar Incidente", e -> abrirIncidente());
             addBoton(panelBotones, "Bloquear Persona", e -> abrirBloqueo());
+        }
+
+        if (rol.equals("FUNCIONARIO")) {
+            addBoton(panelBotones, "Ver Personal Presente en el Complejo", e -> abrirFiltradoPersonasView());
         }
 
         // editar_persona permission: GUARDA, FUNCIONARIO, ADMIN (per data.sql)
@@ -370,5 +385,9 @@ public class PantallaPrincipal extends JFrame {
 
     public void mostrar() {
         setVisible(true);
+    }
+
+    private void abrirFiltradoPersonasView() {
+        new abrirFiltradoPersonasView(usuarioActual, personaRepository, empresaRepository, generarReporteVisitasDentroService, listarPersonasPorEmpresaService).mostrar();
     }
 }

@@ -1,19 +1,36 @@
 package com.acme.sica.usuarios.infrastructure;
 
-import com.acme.sica.personas.application.PersonaRepository;
-import com.acme.sica.personas.application.EmpresaRepository;
-import com.acme.sica.personas.application.CrearPersonaService;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+
 import com.acme.sica.personas.application.ActualizarPersonaService;
+import com.acme.sica.personas.application.CrearPersonaService;
+import com.acme.sica.personas.application.EmpresaRepository;
 import com.acme.sica.personas.application.ListarPersonasPorEmpresaService;
+import com.acme.sica.personas.application.PersonaRepository;
 import com.acme.sica.personas.domain.Persona;
 import com.acme.sica.personas.domain.TipoPersona;
 import com.acme.sica.usuarios.domain.Usuario;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.ListSelectionModel;
-import java.awt.*;
-import java.util.List;
 
 /**
  * Vista de gestion de personas.
