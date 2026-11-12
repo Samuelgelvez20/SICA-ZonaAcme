@@ -1,5 +1,17 @@
 # SICA — Sistema Integrado de Control de Acceso para Zona Acme
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Completado-success?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Version-v1.0.0-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-316192?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Hexagonal_Architecture-purple?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/SOLID_Principles-darkgreen?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
+</p>
+
+
 Sistema de escritorio en **Java SE 21** que digitaliza el control de acceso de un complejo empresarial con +30 empresas. Reemplaza libros de papel y radios por una aplicación con base de datos, autenticación, auditoría y notificación en tiempo real.
 
 ---
@@ -93,6 +105,17 @@ com.acme.sica/
 ├── reportes/            ── Reportes de personas dentro y bitácora
 └── auditoria/           ── Bitácora inmutable
 ```
+
+
+### ⚙️ Aplicación de Principios SOLID
+
+El diseño de SICA cumple rigurosamente con los 5 principios SOLID:
+
+1. **S - Single Responsibility Principle (SRP):** Cada clase tiene una sola razón para cambiar. Los controladores () solo gestionan eventos de la UI, los casos de uso () encapsulan exclusivamente lógica de negocio, y los repositorios () se limitan a operaciones de persistencia SQL.
+2. **O - Open/Closed Principle (OCP):** Nuevas reglas de validación de acceso pueden incorporarse implementando la interfaz  (, ) sin modificar la clase de servicio que las orquesta.
+3. **L - Liskov Substitution Principle (LSP):** Cualquier implementación de un puerto (ej.  o un repositorio en memoria para testing) puede sustituir a la interfaz  sin alterar el comportamiento esperado del sistema.
+4. **I - Interface Segregation Principle (ISP):** Interfaces pequeñas y específicas. En lugar de un repositorio genérico masivo, existen interfaces dedicadas por slice vertical (, , ).
+5. **D - Dependency Inversion Principle (DIP):** Las capas de dominio y aplicación dependen de abstracciones (interfaces de puertos), nunca de detalles técnicos de infraestructura (JDBC/PostgreSQL).
 
 ### 5 Patrones de diseño
 
@@ -349,6 +372,37 @@ Todos los usuarios tienen contraseña `1234` (SHA-256).
 | IDE recomendado | IntelliJ IDEA / VS Code |
 
 ---
+
+
+---
+
+## 👥 Metodología de Trabajo Scrum y Flujo Colaborativo
+
+El proyecto fue desarrollado simulando un entorno profesional de desarrollo ágil bajo el marco **Scrum**, gestionado mediante **GitHub Issues, Milestones y Git Flow**.
+
+### 🗓️ Planificación de Sprints
+- 🎯 **[Sprint 1: Dominio Core y Modelo de Datos](https://github.com/Samuelgelvez20/SICA-ZonaAcme/milestone/1):**
+  - Modelado Entidad-Relación de base de datos relacional en PostgreSQL 16.
+  - Implementación de arquitectura Hexagonal y slices verticales (, , ).
+  - Sistema de autenticación con RBAC y contraseñas hasheadas (SHA-256).
+- 🎯 **[Sprint 2: Control de Acceso, Notificaciones y Auditoría](https://github.com/Samuelgelvez20/SICA-ZonaAcme/milestone/2):**
+  - Implementación de flujos de check-in / check-out para visitantes no anunciados y olvido de carnet.
+  - Panel reactivo de notificaciones para el guarda mediante patrón Observer.
+  - Consultas analíticas de aforo y personas presentes por empresa.
+
+### 📜 Historias de Usuario (User Stories)
+Las tareas se documentaron y validaron como Historias de Usuario con Criterios de Aceptación:
+-  Autenticación y control de roles para guardas y administradores ([Issue #1](https://github.com/Samuelgelvez20/SICA-ZonaAcme/issues/1)).
+-  Control de entrada y salida de visitantes imprevistos con alertas ([Issue #2](https://github.com/Samuelgelvez20/SICA-ZonaAcme/issues/2)).
+-  Reporte en tiempo real de personas dentro de instalaciones ([Issue #3](https://github.com/Samuelgelvez20/SICA-ZonaAcme/issues/3)).
+
+### 🔀 Estrategia de Ramas (Git Flow)
+Se utilizó una estrategia de ramificación estricta:
+- : Código productivo, estable y etiquetado con releases ().
+- : Rama de integración continua.
+- : Ramas de características (, , ).
+- : Ramas de corrección de bugs ().
+- : Ramas de documentación y pulido técnico.
 
 ## Licencia
 
