@@ -363,9 +363,9 @@ Todos los usuarios tienen contraseña `1234` (SHA-256).
 
 | Capa | Tecnología |
 |------|-----------|
-| Lenguaje | Java 21 (JDK Temurin 25) |
+| Lenguaje | Java 21 / 25 LTS |
 | Build | Maven 3.8+ |
-| UI | Java Swing |
+| UI | JavaFX 21 (Modern Enterprise Dark Theme) / Java Swing (Legacy) |
 | Base de datos | PostgreSQL 16 (Docker) |
 | Conector JDBC | PostgreSQL JDBC 42.7.4 |
 | Contenedor | Docker Compose |
