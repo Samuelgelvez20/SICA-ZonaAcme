@@ -38,8 +38,10 @@ public class JavaFxLoginView {
         VBox card = new VBox(20);
         card.getStyleClass().add("card");
         card.setMaxWidth(440);
+        card.setMaxHeight(Region.USE_PREF_SIZE);
         card.setAlignment(Pos.CENTER_LEFT);
         card.setPadding(new Insets(36, 32, 36, 32));
+        StackPane.setAlignment(card, Pos.CENTER);
 
         // Encabezado
         VBox header = new VBox(6);
@@ -171,3 +173,4 @@ public class JavaFxLoginView {
         lblError.setManaged(true);
     }
 }
+

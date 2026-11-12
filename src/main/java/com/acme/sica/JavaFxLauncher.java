@@ -13,3 +13,4 @@ public class JavaFxLauncher {
         Application.launch(SicaApp.class, args);
     }
 }
+

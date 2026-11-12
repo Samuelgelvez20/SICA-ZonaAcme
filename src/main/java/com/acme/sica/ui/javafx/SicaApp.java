@@ -24,6 +24,15 @@ public class SicaApp extends Application {
         primaryStage.setMinWidth(960);
         primaryStage.setMinHeight(640);
 
+        if (getParameters().getUnnamed().contains("--dashboard")) {
+            Usuario admin = services.getUsuarioRepository().buscarPorUsername("admin").orElse(null);
+            if (admin != null) {
+                showDashboard(admin);
+                primaryStage.show();
+                return;
+            }
+        }
+
         showLogin();
         primaryStage.show();
     }
@@ -64,3 +73,4 @@ public class SicaApp extends Application {
         launch(args);
     }
 }
+
